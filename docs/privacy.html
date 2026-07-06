@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bullet Bridge Privacy Policy</title>
+    <style>
+      :root {
+        color-scheme: dark light;
+        --bg: #0f1512;
+        --panel: #151d19;
+        --text: #f2f7f4;
+        --muted: #b8c7c0;
+        --border: #2c3a34;
+        --accent: #44c078;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.55;
+      }
+
+      main {
+        max-width: 820px;
+        margin: 0 auto;
+        padding: 48px 20px 72px;
+      }
+
+      header {
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 28px;
+        padding-bottom: 20px;
+      }
+
+      h1 {
+        font-size: 2rem;
+        line-height: 1.15;
+        margin: 0 0 8px;
+      }
+
+      h2 {
+        font-size: 1.15rem;
+        margin: 32px 0 8px;
+      }
+
+      p,
+      li {
+        color: var(--muted);
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      code {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        color: var(--text);
+        padding: 0 4px;
+      }
+
+      .note {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 14px 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Bullet Bridge Privacy Policy</h1>
+        <p>Last updated: July 7, 2026</p>
+      </header>
+
+      <p class="note">
+        Bullet Bridge is an independent, unofficial browser extension for
+        Pushbullet users. It is not affiliated with, endorsed by, sponsored by,
+        or provided by Pushbullet.
+      </p>
+
+      <h2>Data Storage</h2>
+      <p>
+        Bullet Bridge stores configuration in <code>chrome.storage.local</code>
+        for this extension. Stored data can include:
+      </p>
+      <ul>
+        <li>Pushbullet access token.</li>
+        <li>Pushbullet OAuth client ID and selected sign-in method.</li>
+        <li>Pushbullet account summary returned by the API.</li>
+        <li>Device list.</li>
+        <li>Local Bullet Bridge device record.</li>
+        <li>Extension settings.</li>
+        <li>Push sync cursor.</li>
+        <li>Local unread count.</li>
+        <li>Recent mirrored Android notification records.</li>
+        <li>Temporary file upload status.</li>
+      </ul>
+
+      <h2>Network Requests</h2>
+      <p>
+        Bullet Bridge sends data only to Pushbullet API, websocket, and
+        Pushbullet-provided file upload endpoints:
+      </p>
+      <ul>
+        <li><code>https://www.pushbullet.com/authorize</code></li>
+        <li><code>https://api.pushbullet.com/v2/*</code></li>
+        <li><code>https://api.pushbullet.com/v3/*</code></li>
+        <li><code>wss://stream.pushbullet.com/websocket/*</code></li>
+        <li><code>https://upload.pushbullet.com/*</code></li>
+        <li>Pushbullet-provided HTTPS upload URLs such as S3 upload URLs.</li>
+      </ul>
+
+      <h2>Data Handled</h2>
+      <p>Depending on the features you use, Bullet Bridge can handle:</p>
+      <ul>
+        <li>Pushbullet account details.</li>
+        <li>Device names and device metadata.</li>
+        <li>Push titles, bodies, URLs, file names, and file URLs.</li>
+        <li>Selected file contents for upload.</li>
+        <li>Mirrored Android notification title/body/app/source-device text.</li>
+        <li>
+          Current active tab URL/title when you click the current-tab send
+          action.
+        </li>
+      </ul>
+      <p>
+        This data is used only to provide extension functionality: showing the
+        UI, sending pushes, uploading selected files, displaying notifications,
+        opening links you request, and searching loaded push history locally.
+      </p>
+
+      <h2>No Analytics Or Tracking</h2>
+      <p>
+        Bullet Bridge does not include analytics, ads, trackers, telemetry,
+        remote code execution, or third-party reporting services.
+      </p>
+
+      <h2>Data Sharing</h2>
+      <p>
+        Bullet Bridge does not sell user data and does not transfer user data
+        for advertising or unrelated purposes. Data is sent only to Pushbullet
+        and Pushbullet-provided endpoints required for the features you use.
+      </p>
+
+      <h2>User Control</h2>
+      <p>
+        You can clear local Bullet Bridge account data from the extension
+        settings. You can also revoke Bullet Bridge access from your Pushbullet
+        account settings.
+      </p>
+
+      <h2>Contact</h2>
+      <p>
+        For support or privacy questions, use the project issue tracker:
+        <a href="https://github.com/bulletbridge/bullet-bridge/issues">https://github.com/bulletbridge/bullet-bridge/issues</a>.
+      </p>
+
+      <h2>Trademark Notice</h2>
+      <p>
+        Pushbullet is a trademark of its respective owner. The Pushbullet name
+        is used only to describe compatibility with the Pushbullet service.
+      </p>
+    </main>
+  </body>
+</html>

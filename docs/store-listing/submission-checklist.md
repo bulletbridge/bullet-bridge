@@ -7,7 +7,8 @@
 - Confirm screenshots are current, real UI captures, and `1280x800`.
 - Confirm a right-click context menu screenshot is captured as
   `docs/screenshots/05-context-menu.png`.
-- Confirm `PRIVACY.md` is hosted at a public HTTPS URL.
+- Confirm GitHub Pages serves
+  `https://bulletbridge.github.io/bullet-bridge/privacy.html`.
 - Confirm the support email is active and monitored.
 - Confirm the listing copy says Bullet Bridge is independent and unofficial.
 - Confirm the listing does not use Pushbullet logos, icons, or official branding.
