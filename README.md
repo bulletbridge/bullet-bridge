@@ -92,7 +92,7 @@ chrome-extension://ibhimmdnfbnhjdidoofgmlmngjdbneal
 
 The redirect URI depends on the installed extension ID. This GitHub-only build pins the unpacked extension ID with `manifest.key`. A future Chrome Web Store release must use the stable ID assigned to that store item and a matching OAuth client.
 
-Before public release, keep the Pushbullet OAuth client display identity aligned with Bullet Bridge:
+Keep the Pushbullet OAuth client display identity aligned with Bullet Bridge:
 
 - Name: `Bullet Bridge`
 - Website URL: `https://github.com/bulletbridge/bullet-bridge` or the future project site.
