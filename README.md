@@ -47,6 +47,8 @@ ibhimmdnfbnhjdidoofgmlmngjdbneal
 
 <img src="docs/screenshots/04-search.png" alt="Bullet Bridge loaded push search" width="640">
 
+<img src="docs/screenshots/05-context-menu.png" alt="Bullet Bridge right-click context menu" width="640">
+
 ## Not Included
 
 - SMS.
