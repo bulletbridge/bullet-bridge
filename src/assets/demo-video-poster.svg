@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">Demo video preview</title>
+  <desc id="desc">A video poster frame used for Bullet Bridge screenshot demo mode.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#19382b"/>
+      <stop offset=".55" stop-color="#10231b"/>
+      <stop offset="1" stop-color="#09120f"/>
+    </linearGradient>
+    <linearGradient id="wave" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#45c878"/>
+      <stop offset=".52" stop-color="#6ee7b7"/>
+      <stop offset="1" stop-color="#38bdf8"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" fill="url(#sky)"/>
+  <circle cx="742" cy="126" r="58" fill="#6ee7b7" opacity=".26"/>
+  <path d="M0 364c116-66 210-72 302-20 112 64 188 62 304-12 96-62 206-58 354 14v194H0Z" fill="#101b17"/>
+  <path d="M0 392c124-58 218-56 316 4 112 68 204 60 318-18 90-62 192-58 326 18v144H0Z" fill="url(#wave)" opacity=".52"/>
+  <rect x="320" y="140" width="320" height="224" rx="28" fill="#07100d" opacity=".72" stroke="#5ee59c" stroke-width="3"/>
+  <circle cx="480" cy="252" r="70" fill="#45c878"/>
+  <path d="M456 210v84l72-42-72-42Z" fill="#f7fff9"/>
+  <rect x="332" y="386" width="296" height="12" rx="6" fill="#263b32"/>
+  <rect x="332" y="386" width="132" height="12" rx="6" fill="#6ee7b7"/>
+  <circle cx="464" cy="392" r="12" fill="#f7fff9"/>
+</svg>

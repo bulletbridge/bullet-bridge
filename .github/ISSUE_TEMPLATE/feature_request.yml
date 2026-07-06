@@ -1,0 +1,43 @@
+name: Feature request
+description: Suggest an improvement or missing workflow.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or workflow
+      description: What are you trying to do, and where does Bullet Bridge fall short?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the behavior or UI you want.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Sending
+        - Receiving
+        - Push history
+        - Mirrored notifications
+        - Files
+        - Devices/streams
+        - Settings
+        - Packaging/distribution
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add examples, screenshots, or links that clarify the request.
+    validations:
+      required: false

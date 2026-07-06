@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">Demo image preview</title>
+  <desc id="desc">A clean dashboard preview used for Bullet Bridge screenshot demo mode.</desc>
+  <defs>
+    <linearGradient id="screen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#13231b"/>
+      <stop offset="1" stop-color="#0c1210"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#45c878"/>
+      <stop offset="1" stop-color="#6ee7b7"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" fill="#07100d"/>
+  <rect x="58" y="44" width="844" height="452" rx="30" fill="url(#screen)" stroke="#2f4439" stroke-width="3"/>
+  <rect x="102" y="92" width="200" height="34" rx="17" fill="#25372f"/>
+  <rect x="104" y="154" width="210" height="266" rx="20" fill="#101b17" stroke="#2b4036" stroke-width="2"/>
+  <rect x="348" y="154" width="230" height="266" rx="20" fill="#101b17" stroke="#2b4036" stroke-width="2"/>
+  <rect x="612" y="154" width="244" height="266" rx="20" fill="#101b17" stroke="#2b4036" stroke-width="2"/>
+  <rect x="132" y="190" width="120" height="120" rx="18" fill="url(#accent)"/>
+  <circle cx="192" cy="250" r="35" fill="#07100d" opacity=".22"/>
+  <path d="M172 268 189 244l22 30 12-15 28 39H142l30-30Z" fill="#f7fff9"/>
+  <rect x="132" y="342" width="148" height="18" rx="9" fill="#3b5548"/>
+  <rect x="132" y="378" width="98" height="18" rx="9" fill="#2b4036"/>
+  <rect x="376" y="190" width="174" height="24" rx="12" fill="#45c878"/>
+  <rect x="376" y="240" width="148" height="18" rx="9" fill="#3b5548"/>
+  <rect x="376" y="276" width="116" height="18" rx="9" fill="#2b4036"/>
+  <rect x="376" y="322" width="170" height="52" rx="14" fill="#17251f" stroke="#335243" stroke-width="2"/>
+  <rect x="642" y="190" width="176" height="142" rx="18" fill="#17251f"/>
+  <path d="M664 298 704 248l36 38 28-32 54 64H664Z" fill="#45c878"/>
+  <circle cx="792" cy="220" r="22" fill="#6ee7b7"/>
+  <rect x="642" y="360" width="154" height="18" rx="9" fill="#3b5548"/>
+  <rect x="642" y="396" width="108" height="18" rx="9" fill="#2b4036"/>
+</svg>

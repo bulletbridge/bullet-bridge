@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bullet Bridge Options</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="options.css">
+  </head>
+  <body class="options">
+    <header class="page-header">
+      <div class="brand">
+        <img src="../icons/icon.svg" alt="" width="40" height="40">
+        <div>
+          <h1>Bullet Bridge</h1>
+          <p>Pushbullet client settings</p>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <div class="layout-column">
+        <section class="panel account-panel">
+          <h2>Account</h2>
+          <p id="accountSummary" class="muted">Not connected.</p>
+
+          <div class="account-card">
+            <div>
+              <h3>Pushbullet sign-in</h3>
+              <p id="oauthStatusText" class="muted">Checking OAuth configuration...</p>
+            </div>
+            <div class="actions account-actions">
+              <button id="oauthSignInButton" class="primary" type="button">
+                <svg class="button-icon" aria-hidden="true" viewBox="0 0 24 24">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v4"></path>
+                  <path d="M10 14 21 3"></path>
+                  <path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"></path>
+                </svg>
+                <span>Sign In with Pushbullet</span>
+              </button>
+              <button id="clearTokenButton" class="danger" type="button">
+                <svg class="button-icon" aria-hidden="true" viewBox="0 0 24 24">
+                  <path d="M3 6h18"></path>
+                  <path d="M8 6V4h8v2"></path>
+                  <path d="M19 6l-1 14H6L5 6"></path>
+                  <path d="M10 11v5"></path>
+                  <path d="M14 11v5"></path>
+                </svg>
+                <span>Clear Account</span>
+              </button>
+            </div>
+          </div>
+
+          <details class="manual-token-card">
+            <summary>Manual token fallback</summary>
+            <div class="manual-token-body">
+              <label class="field">
+                <span>Access token</span>
+                <input id="tokenInput" type="password" autocomplete="off" spellcheck="false" placeholder="Paste token from Pushbullet account settings">
+              </label>
+
+              <div class="actions">
+                <button id="saveTokenButton" class="secondary" type="button">
+                  <svg class="button-icon" aria-hidden="true" viewBox="0 0 24 24">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"></path>
+                    <path d="M17 21v-8H7v8"></path>
+                    <path d="M7 3v5h8"></path>
+                  </svg>
+                  <span>Save and Test</span>
+                </button>
+              </div>
+            </div>
+          </details>
+        </section>
+
+        <section class="panel delivery-panel">
+          <h2>Delivery</h2>
+
+          <label class="field">
+            <span>Default target</span>
+            <select id="defaultDeviceSelect">
+              <option value="">All devices</option>
+            </select>
+          </label>
+
+          <fieldset class="choice-group">
+            <legend>Send shortcut</legend>
+            <label>
+              <input type="radio" name="sendShortcut" value="ctrlEnter">
+              <span>Ctrl + Enter</span>
+            </label>
+            <label>
+              <input type="radio" name="sendShortcut" value="enter">
+              <span>Enter</span>
+            </label>
+          </fieldset>
+
+          <label class="toggle">
+            <input id="showPushNotifications" type="checkbox">
+            <span>Show received pushes as browser notifications</span>
+          </label>
+
+          <label class="toggle">
+            <input id="showMirroredNotifications" type="checkbox">
+            <span>Show mirrored Android notifications</span>
+          </label>
+
+          <label class="toggle">
+            <input id="openLinksOnNotificationClick" type="checkbox">
+            <span>Open pushed links when notification is clicked</span>
+          </label>
+
+          <label class="toggle">
+            <input id="closeNotificationsAsDismiss" type="checkbox">
+            <span>Treat closing browser notifications as dismiss</span>
+          </label>
+        </section>
+      </div>
+
+      <div class="layout-column">
+        <section class="panel connection-panel">
+          <h2>Connection</h2>
+          <div class="connection-summary">
+            <span id="connectionStatus" class="status-pill">Unknown</span>
+            <p id="connectionSummary" class="muted">Checking Pushbullet connection...</p>
+          </div>
+          <dl class="connection-details">
+            <div>
+              <dt>This browser</dt>
+              <dd id="localDevice">Not registered</dd>
+            </div>
+            <div>
+              <dt>Realtime activity</dt>
+              <dd id="lastStreamEvent">Never</dd>
+            </div>
+            <div>
+              <dt>History sync</dt>
+              <dd id="lastPushSync">Never</dd>
+            </div>
+          </dl>
+          <p id="connectionError" class="feedback error"></p>
+          <div class="actions">
+            <button id="reconnectButton" class="secondary" type="button">
+              <svg class="button-icon" aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                <path d="M3 21v-5h5"></path>
+                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                <path d="M16 8h5V3"></path>
+              </svg>
+              <span>Reconnect</span>
+            </button>
+            <button id="refreshDevicesButton" class="secondary" type="button">
+              <svg class="button-icon" aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M4 7h16"></path>
+                <path d="M4 12h16"></path>
+                <path d="M4 17h16"></path>
+                <path d="M8 7v10"></path>
+              </svg>
+              <span>Refresh Devices</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="panel devices-panel">
+          <div class="panel-title-row">
+            <h2>Devices</h2>
+            <button id="cleanupOldDevicesButton" class="secondary compact hidden" type="button">
+              <svg class="button-icon" aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M3 6h18"></path>
+                <path d="M8 6V4h8v2"></path>
+                <path d="M19 6l-1 14H6L5 6"></path>
+                <path d="M10 11v5"></path>
+                <path d="M14 11v5"></path>
+              </svg>
+              <span>Clean Up Old Entries</span>
+            </button>
+          </div>
+          <p id="deviceCleanupHint" class="muted"></p>
+          <div id="deviceList" class="device-list"></div>
+        </section>
+      </div>
+    </main>
+
+    <p id="feedback" class="toast" role="status" aria-live="polite"></p>
+
+    <script type="module" src="options.js"></script>
+  </body>
+</html>

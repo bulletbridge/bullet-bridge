@@ -1,0 +1,2 @@
+export const PUSHBULLET_OAUTH_CLIENT_ID = "qM5PtPPVhEJ969uyvtnHAu9CPkFADWUH";
+export const PUSHBULLET_OAUTH_REDIRECT_PATH = "pushbullet";

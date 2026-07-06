@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">Demo preview image</title>
+  <desc id="desc">Abstract dashboard preview used for Bullet Bridge demo screenshots.</desc>
+  <rect width="960" height="540" fill="#101714"/>
+  <rect x="72" y="58" width="816" height="424" rx="22" fill="#18231d" stroke="#32443a" stroke-width="3"/>
+  <rect x="108" y="96" width="290" height="152" rx="14" fill="#203429"/>
+  <rect x="430" y="96" width="322" height="54" rx="12" fill="#1f8f4d"/>
+  <rect x="430" y="178" width="322" height="22" rx="11" fill="#4bb979"/>
+  <rect x="430" y="220" width="226" height="22" rx="11" fill="#31443a"/>
+  <rect x="108" y="286" width="744" height="28" rx="14" fill="#31443a"/>
+  <rect x="108" y="340" width="572" height="28" rx="14" fill="#31443a"/>
+  <rect x="108" y="394" width="668" height="28" rx="14" fill="#31443a"/>
+  <circle cx="180" cy="172" r="44" fill="#4bb979"/>
+  <path d="M168 148h26c20 0 34 14 34 34s-14 34-34 34h-26V148Zm18 18v32h8c10 0 16-6 16-16s-6-16-16-16h-8Z" fill="#f7fff9"/>
+</svg>

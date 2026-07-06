@@ -1,0 +1,96 @@
+name: Bug report
+description: Report something that is broken or behaving incorrectly.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem. Please include enough detail to reproduce it.
+  - type: input
+    id: version
+    attributes:
+      label: Bullet Bridge version
+      description: Open the browser extensions page and copy the version shown for Bullet Bridge.
+      placeholder: "0.3.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      options:
+        - Brave
+        - Chrome
+        - Chromium
+        - Edge
+        - Other Chromium-compatible browser
+    validations:
+      required: true
+  - type: dropdown
+    id: install-method
+    attributes:
+      label: Install method
+      options:
+        - Loaded unpacked from GitHub source
+        - Built zip from GitHub source
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: auth-method
+    attributes:
+      label: Sign-in method
+      options:
+        - Pushbullet OAuth
+        - Manual access token
+        - Not signed in
+        - Not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      options:
+        - Sending notes
+        - Sending links
+        - Sending files
+        - Receiving pushes
+        - Mirrored notifications
+        - Push history
+        - Stream/device list
+        - OAuth sign-in
+        - Manual token setup
+        - Popup layout
+        - Options page
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the problem and what you expected to happen instead.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: List the exact steps that trigger the issue.
+      placeholder: |
+        1. Open Bullet Bridge
+        2. Select ...
+        3. Click ...
+        4. See ...
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Relevant details
+      description: Add screenshots, console errors, service worker errors, file type/size, device names, or push type if relevant. Do not paste access tokens.
+    validations:
+      required: false

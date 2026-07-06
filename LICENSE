@@ -1,0 +1,92 @@
+Bullet Bridge Source Available License
+Version 1.0
+
+Copyright (c) 2026 Bullet Bridge contributors
+
+This license applies to the Bullet Bridge source code, documentation, icons,
+screenshots, and other materials in this repository, except where a file states
+otherwise.
+
+## 1. Purpose
+
+Bullet Bridge is published source-available so users can inspect how the
+extension works, verify privacy-sensitive behavior, and build trust before
+installing it.
+
+This is not an open-source license. It does not grant permission to redistribute
+Bullet Bridge, publish modified versions, sell copies, sublicense the project,
+or submit derivative browser extensions to extension stores.
+
+## 2. Permissions
+
+You may:
+
+- View, download, and audit the source code.
+- Build and install Bullet Bridge for your own personal or internal evaluation.
+- Install and use official Bullet Bridge releases provided by the Bullet Bridge
+  project.
+- Create a GitHub fork only for inspection, private evaluation, or proposing
+  changes back to the official Bullet Bridge repository.
+- Submit issues, security reports, and pull requests to the official Bullet
+  Bridge repository.
+
+## 3. Restrictions
+
+You may not, without prior written permission from the Bullet Bridge project:
+
+- Redistribute the source code or compiled extension outside GitHub's normal
+  repository viewing and forking features.
+- Publish, upload, or distribute modified or derivative versions.
+- Submit Bullet Bridge, modified Bullet Bridge builds, or substantially similar
+  derivative extensions to browser extension stores.
+- Sell, rent, sublicense, or commercially host Bullet Bridge.
+- Remove or obscure copyright, license, privacy, attribution, or disclaimer
+  notices.
+- Use the Bullet Bridge name, BB icon, project artwork, screenshots, or
+  confusingly similar branding for another project, fork, product, extension, or
+  store listing.
+- Imply that Bullet Bridge is affiliated with, endorsed by, sponsored by, or
+  provided by Pushbullet.
+- Use Pushbullet trademarks, logos, or branding except to accurately describe
+  compatibility with the Pushbullet service.
+
+## 4. Contributions
+
+By submitting a contribution to the Bullet Bridge project, you confirm that you
+have the right to submit it and you grant the Bullet Bridge project a perpetual,
+worldwide, royalty-free license to use, modify, distribute, sublicense, and
+relicense that contribution as part of Bullet Bridge.
+
+Submitted contributions do not change the license terms for the rest of the
+project unless the Bullet Bridge project explicitly accepts different terms in
+writing.
+
+## 5. Third-Party Services And Trademarks
+
+Bullet Bridge interoperates with the Pushbullet service through Pushbullet's
+public APIs. This license grants no rights to Pushbullet, the Pushbullet service,
+or Pushbullet trademarks.
+
+Pushbullet is a trademark of its respective owner. Bullet Bridge is an
+independent, unofficial client and is not affiliated with, endorsed by,
+sponsored by, or provided by Pushbullet.
+
+Users and developers are responsible for complying with Pushbullet's terms,
+API rules, and account requirements when using Bullet Bridge.
+
+## 6. Termination
+
+If you violate this license, your rights under this license terminate
+automatically. The Bullet Bridge project may reinstate rights at its discretion
+in writing.
+
+## 7. No Warranty
+
+Bullet Bridge is provided "as is", without warranty of any kind, express or
+implied, including but not limited to warranties of merchantability, fitness for
+a particular purpose, non-infringement, availability, security, or compatibility
+with Pushbullet.
+
+To the maximum extent permitted by law, the copyright holders and contributors
+are not liable for any claim, damages, data loss, account issue, service
+interruption, or other liability arising from use of Bullet Bridge.

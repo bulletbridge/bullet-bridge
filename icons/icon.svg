@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Bullet Bridge">
+  <defs>
+    <linearGradient id="bb-bg" x1="18" y1="12" x2="112" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#22a663"/>
+      <stop offset="0.52" stop-color="#16834a"/>
+      <stop offset="1" stop-color="#0d5f39"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="24" fill="url(#bb-bg)"/>
+  <text x="52" y="94" fill="#bff4d4" font-family="Noto Sans Display, Noto Sans, Arial, sans-serif" font-size="76" font-weight="800" text-anchor="middle">B</text>
+  <text x="78" y="94" fill="#ffffff" font-family="Noto Sans Display, Noto Sans, Arial, sans-serif" font-size="76" font-weight="800" text-anchor="middle">B</text>
+</svg>
