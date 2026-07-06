@@ -30,7 +30,7 @@ const requiredFiles = [
   "PRIVACY.md",
   "TRADEMARK.md",
   "CHANGELOG.md",
-  "RELEASE_CHECKLIST.md",
+  "docs/store-listing/submission-checklist.md",
   "scripts/package-extension.sh",
   "LICENSE"
 ];
