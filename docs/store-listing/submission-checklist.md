@@ -3,7 +3,9 @@
 ## Before First Upload
 
 - Confirm `npm run check` passes.
-- Confirm `npm run build` creates a zip with `manifest.json` at the zip root.
+- Confirm `npm run build:webstore` creates a zip with `manifest.json` at the
+  zip root.
+- Confirm the Web Store zip does not include `manifest.key`.
 - Confirm screenshots are current, real UI captures, and `1280x800`.
 - Confirm a right-click context menu screenshot is captured as
   `docs/screenshots/05-context-menu.png`.
@@ -17,7 +19,8 @@
 
 ## First Chrome Web Store Draft
 
-- Upload the package as a draft or private trusted-tester item.
+- Upload `dist/bullet-bridge-<version>-webstore.zip` as a draft or private
+  trusted-tester item.
 - Copy the assigned Chrome Web Store extension ID.
 - Add this redirect URI to the Bullet Bridge Pushbullet OAuth client:
 
@@ -52,7 +55,7 @@
 - Increase `manifest.json` and `package.json` versions before uploading a new
   package.
 - Run `npm run check`.
-- Run `npm run build`.
+- Run `npm run build:webstore`.
 - Upload the new zip in the Package tab.
 - Update the listing metadata only if the user-facing behavior changed.
 - Add a concise "What's New" note for meaningful releases.
