@@ -123,6 +123,16 @@ npm run build
 
 The build output is written to `dist/bullet-bridge-<version>.zip`.
 
+Build a Chrome Web Store draft zip:
+
+```bash
+npm run build:webstore
+```
+
+The Web Store build output is written to
+`dist/bullet-bridge-<version>-webstore.zip` and removes `manifest.key` so the
+Chrome Web Store can assign the store item ID.
+
 ## Screenshot Demo Mode
 
 Use demo mode when capturing public screenshots so real names, devices, pushes, and notifications are not shown.
