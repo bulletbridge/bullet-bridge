@@ -53,7 +53,12 @@ ibhimmdnfbnhjdidoofgmlmngjdbneal
 
 - SMS.
 - Chrome Web Store packaging.
-- Hosted privacy policy.
+
+## Hosted Privacy Policy
+
+The extension store privacy policy page is:
+
+https://bulletbridge.github.io/bullet-bridge/privacy.html
 
 ## Install From GitHub
 
@@ -152,7 +157,7 @@ See [TRADEMARK.md](TRADEMARK.md) for Bullet Bridge branding and Pushbullet compa
 
 Version `0.4.0` is a GitHub-only build that is usable for daily testing.
 
-Current distribution target is GitHub-only. Before any Chrome Web Store release, the project should add a hosted privacy policy, store listing copy, and a full Chrome Web Store policy review.
+Current distribution target is GitHub-only. Before any Chrome Web Store release, the project should complete a full Chrome Web Store policy review and trusted-tester install test.
 
 ## Disclaimer
 

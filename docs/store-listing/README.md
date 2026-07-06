@@ -52,9 +52,13 @@ right-click menu. Do not mock or generate it.
 
 ## Privacy Policy
 
-Use `PRIVACY.md` as the source text for a hosted privacy policy page. A Chrome
-Web Store listing should point to a public HTTPS URL, for example a GitHub Pages
-page generated from this repository.
+Use the hosted GitHub Pages privacy policy URL:
+
+```text
+https://bulletbridge.github.io/bullet-bridge/privacy.html
+```
+
+The source file is `docs/privacy.html`.
 
 ## Source References
 
