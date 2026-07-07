@@ -4,6 +4,8 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
+WEBSTORE_PUSHBULLET_OAUTH_CLIENT_ID="vqzUGzUfUrL6UK8tuNGvf4TqbMUhWGrX"
+
 npm run check
 
 VERSION="$(node -p "require('./package.json').version")"
@@ -35,13 +37,28 @@ cp manifest.json LICENSE PRIVACY.md TRADEMARK.md "$STAGING_DIR/"
 cp -R icons src "$STAGING_DIR/"
 
 if [[ "$TARGET" == "webstore" ]]; then
-  node --input-type=module - "$STAGING_DIR/manifest.json" <<'NODE'
+  node --input-type=module - "$STAGING_DIR/manifest.json" "$STAGING_DIR/src/shared/config.js" "$WEBSTORE_PUSHBULLET_OAUTH_CLIENT_ID" <<'NODE'
 import fs from "node:fs";
 
 const manifestPath = process.argv[2];
+const configPath = process.argv[3];
+const webstoreClientId = process.argv[4];
+
 const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
 delete manifest.key;
 fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+
+const config = fs.readFileSync(configPath, "utf8");
+const nextConfig = config.replace(
+  /export const PUSHBULLET_OAUTH_CLIENT_ID = "[^"]*";/,
+  `export const PUSHBULLET_OAUTH_CLIENT_ID = "${webstoreClientId}";`,
+);
+
+if (nextConfig === config) {
+  throw new Error("Unable to inject Web Store Pushbullet OAuth client ID");
+}
+
+fs.writeFileSync(configPath, nextConfig);
 NODE
 fi
 
@@ -53,6 +70,11 @@ unzip -tq "$OUT" >/dev/null
 
 if [[ "$TARGET" == "webstore" ]] && unzip -p "$OUT" manifest.json | grep -q '"key"'; then
   echo "Web Store package must not include manifest.key" >&2
+  exit 1
+fi
+
+if [[ "$TARGET" == "webstore" ]] && ! unzip -p "$OUT" src/shared/config.js | grep -qF "$WEBSTORE_PUSHBULLET_OAUTH_CLIENT_ID"; then
+  echo "Web Store package must include the Web Store Pushbullet OAuth client ID" >&2
   exit 1
 fi
 
