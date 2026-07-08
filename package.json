@@ -1,6 +1,6 @@
 {
   "name": "bullet-bridge",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "private": true,
   "description": "Source-available Manifest V3 browser extension for Pushbullet users.",
   "type": "module",

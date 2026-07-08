@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "Bullet Bridge",
+  "name": "Bullet Bridge for Pushbullet",
   "short_name": "Bullet Bridge",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtrPuv/wKZE9lTdo1eAuC+wKUDfaLlqqJtKkt/Ec+TcdimMvoWOD+lLyGcOhaX+BJ+g90wTOCGkqwUiwrwJup78e6YFa0nMiM4XAJTY95LoXjTtyLiUoF15haWqn6ywOzjlBkNCZ6141rjuQWbtv4NJqyFU0M11GOSpSBB7ZETm+4PxNvT38EnIApDxFcx/Bi3dKoVhOQEwVtRFYlQt1Q7x74eYAVcwfUsBfxNeyrhlDgNU9e/jiLtSVfyKvhzZC5WNS7QsR53oTjeWl/Ivyxs6RF7E2Yguc1uG+8egWIt8+zaqohtUOvsBXmHRJhrkW5rQHtkYOOfO5s24nrjZKG6wIDAQAB",
-  "description": "Unofficial Pushbullet client for sending, receiving, and browsing browser pushes.",
+  "description": "Unofficial Pushbullet extension for sending, receiving, searching, and managing pushes, files, links, and notifications.",
   "minimum_chrome_version": "116",
   "permissions": [
     "activeTab",
