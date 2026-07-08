@@ -1,11 +1,26 @@
-# Chrome Web Store Submission Checklist
+# Chrome Web Store Maintenance Checklist
 
-## Before First Upload
+## Current Listing
+
+Published listing:
+
+```text
+https://chromewebstore.google.com/detail/bullet-bridge/iadffmbdjdnnnpdmackjpoieokimphbn
+```
+
+Chrome Web Store extension ID:
+
+```text
+iadffmbdjdnnnpdmackjpoieokimphbn
+```
+
+## Before Each Package Upload
 
 - Confirm `npm run check` passes.
 - Confirm `npm run build:webstore` creates a zip with `manifest.json` at the
   zip root.
 - Confirm the Web Store zip does not include `manifest.key`.
+- Confirm the Web Store zip includes the Web Store Pushbullet OAuth client ID.
 - Confirm screenshots are current, real UI captures, and `1280x800`.
 - Confirm a right-click context menu screenshot is captured as
   `docs/screenshots/05-context-menu.png`.
@@ -17,19 +32,10 @@
 - Confirm no secrets, `.pem` files, `.env` files, local tokens, or packaged zip
   files are committed.
 
-## First Chrome Web Store Draft
+## Manual Smoke Test
 
-- Upload `dist/bullet-bridge-<version>-webstore.zip` as a draft or private
-  trusted-tester item.
-- Copy the assigned Chrome Web Store extension ID.
-- Add this redirect URI to the Bullet Bridge Pushbullet OAuth client:
-
-  ```text
-  https://<chrome-web-store-extension-id>.chromiumapp.org/pushbullet
-  ```
-
-- Build a package that uses the OAuth client intended for the store build.
-- Install the trusted-tester item and test OAuth sign-in.
+- Install the Chrome Web Store version.
+- Confirm OAuth sign-in uses the Web Store extension ID.
 - Send a note to all devices.
 - Send a note to one device.
 - Send a file.
@@ -41,21 +47,13 @@
 - Delete a push.
 - Load older pushes.
 
-## Public Submission
-
-- Recheck listing text, screenshots, privacy policy, and permission
-  justifications.
-- Set distribution to public only after trusted-tester install and OAuth are
-  confirmed.
-- Submit for review.
-- Watch the support email for Chrome Web Store review messages.
-
 ## Future Updates
 
 - Increase `manifest.json` and `package.json` versions before uploading a new
   package.
 - Run `npm run check`.
 - Run `npm run build:webstore`.
-- Upload the new zip in the Package tab.
+- Upload the new zip in the Chrome Web Store package flow.
 - Update the listing metadata only if the user-facing behavior changed.
 - Add a concise "What's New" note for meaningful releases.
+- Watch the support email for Chrome Web Store review messages.
