@@ -2,15 +2,15 @@
 
 ## Name
 
-Bullet Bridge
+Bullet Bridge for Pushbullet
 
 ## Summary
 
-Send, receive, search, and manage Pushbullet pushes from a modern browser.
+Send, receive, search, and manage Pushbullet pushes, files, links, and notifications.
 
 ## Category
 
-Productivity
+Communication
 
 ## Language
 
@@ -18,10 +18,9 @@ English
 
 ## Detailed Description
 
-Bullet Bridge is an independent browser extension for Pushbullet users. It
-brings Pushbullet sending, receiving, file sharing, mirrored notifications, push
-history, media previews, search, and right-click sharing back to modern
-Chromium-based browsers.
+Bullet Bridge for Pushbullet is an independent browser extension for Pushbullet
+users who want push history, file sending, media previews, search,
+notifications, and right-click sharing in modern Chromium-based browsers.
 
 Bullet Bridge is not affiliated with, endorsed by, sponsored by, or provided by
 Pushbullet.
@@ -56,17 +55,11 @@ Privacy posture:
 
 ## What's New
 
-Version 0.4.0:
+Version 0.4.1:
 
-- Initial public GitHub release.
-- Pushbullet OAuth sign-in.
-- Push history with older-push loading.
-- Search for loaded pushes.
-- Inline image, video, file, and link previews.
-- File sending with upload progress.
-- Right-click sharing for pages, links, selected text, and image URLs.
-- Mirrored Android notification display and dismissal.
-- Device cleanup for stale Bullet Bridge browser entries.
+- Renamed the Chrome Web Store package title to "Bullet Bridge for Pushbullet"
+  so Pushbullet users can find the extension more easily.
+- Improved the Chrome Web Store summary and description.
 
 ## Disclaimer
 

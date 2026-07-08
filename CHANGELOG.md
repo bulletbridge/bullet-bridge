@@ -4,6 +4,14 @@
 
 Nothing yet.
 
+## 0.4.1 - 2026-07-08
+
+- Changed the Chrome Web Store package title to `Bullet Bridge for Pushbullet`
+  while keeping the in-app name as `Bullet Bridge`.
+- Improved the Chrome Web Store package summary for Pushbullet search
+  visibility and clearer user expectations.
+- Updated store-listing documentation for the `0.4.1` metadata update.
+
 ## 0.4.0 - 2026-07-06
 
 - Changed project licensing from MIT to the Bullet Bridge Source Available License.

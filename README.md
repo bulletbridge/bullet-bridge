@@ -174,7 +174,7 @@ See [TRADEMARK.md](TRADEMARK.md) for Bullet Bridge branding and Pushbullet compa
 
 ## Release Status
 
-Version `0.4.0` is published on the Chrome Web Store and available as a GitHub/unpacked build.
+Bullet Bridge is published on the Chrome Web Store and available as a GitHub/unpacked build. The current source version is `0.4.1`.
 
 ## Disclaimer
 
