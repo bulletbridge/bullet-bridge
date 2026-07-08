@@ -8,7 +8,11 @@ Bullet Bridge is an independent, unofficial client for Pushbullet users. It is n
 
 This repository is source-available for transparency and user trust. It is not open source in the OSI sense, and the license does not allow republishing modified copies or submitting derivative browser extensions to extension stores without permission.
 
-GitHub-only builds use a fixed extension ID for unpacked installs:
+Install Bullet Bridge from the Chrome Web Store:
+
+https://chromewebstore.google.com/detail/bullet-bridge/iadffmbdjdnnnpdmackjpoieokimphbn
+
+GitHub/unpacked builds use a fixed extension ID for unpacked installs:
 
 ```text
 ibhimmdnfbnhjdidoofgmlmngjdbneal
@@ -52,13 +56,18 @@ ibhimmdnfbnhjdidoofgmlmngjdbneal
 ## Not Included
 
 - SMS.
-- Chrome Web Store packaging.
 
 ## Hosted Privacy Policy
 
 The extension store privacy policy page is:
 
 https://bulletbridge.github.io/bullet-bridge/privacy.html
+
+## Install From Chrome Web Store
+
+Install the published extension:
+
+https://chromewebstore.google.com/detail/bullet-bridge/iadffmbdjdnnnpdmackjpoieokimphbn
 
 ## Install From GitHub
 
@@ -83,7 +92,7 @@ https://www.pushbullet.com/#settings/account
 
 ## Maintainer OAuth Configuration
 
-The GitHub-only build includes the Bullet Bridge Pushbullet OAuth client ID. Users do not need to create their own OAuth client.
+The GitHub/unpacked build includes the Bullet Bridge Pushbullet OAuth client ID. Users do not need to create their own OAuth client.
 
 The bundled Pushbullet OAuth client must use this redirect URI:
 
@@ -97,7 +106,7 @@ Leave `allowed_origin` blank if Pushbullet accepts it. If Pushbullet requires a 
 chrome-extension://ibhimmdnfbnhjdidoofgmlmngjdbneal
 ```
 
-The redirect URI depends on the installed extension ID. This GitHub-only build pins the unpacked extension ID with `manifest.key`. A future Chrome Web Store release must use the stable ID assigned to that store item and a matching OAuth client.
+The redirect URI depends on the installed extension ID. The GitHub/unpacked build pins the unpacked extension ID with `manifest.key`. Chrome Web Store packages remove `manifest.key` and inject the Web Store OAuth client ID during `npm run build:webstore`.
 
 Keep the Pushbullet OAuth client display identity aligned with Bullet Bridge:
 
@@ -165,9 +174,7 @@ See [TRADEMARK.md](TRADEMARK.md) for Bullet Bridge branding and Pushbullet compa
 
 ## Release Status
 
-Version `0.4.0` is a GitHub-only build that is usable for daily testing.
-
-Current distribution target is GitHub-only. Before any Chrome Web Store release, the project should complete a full Chrome Web Store policy review and trusted-tester install test.
+Version `0.4.0` is published on the Chrome Web Store and available as a GitHub/unpacked build.
 
 ## Disclaimer
 

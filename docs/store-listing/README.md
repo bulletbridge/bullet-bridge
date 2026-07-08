@@ -1,21 +1,13 @@
-# Chrome Web Store Listing Prep
+# Chrome Web Store Listing
 
-This folder contains the working copy for a future Chrome Web Store listing.
+This folder contains the working copy for the Bullet Bridge Chrome Web Store
+listing.
 
-## Recommended Release Path
+Published listing:
 
-Start with a Chrome Web Store draft or private trusted-tester item, not a public
-submission.
-
-Why:
-
-- The first Chrome Web Store upload assigns the permanent extension ID.
-- That ID must be added to the Pushbullet OAuth redirect URI before users can
-  sign in from the store build.
-- A private trusted-tester listing lets the install, OAuth, permissions, and
-  update flow be tested before public launch.
-- After the trusted-tester build works end to end, use the same listing for a
-  public submission.
+```text
+https://chromewebstore.google.com/detail/bullet-bridge/iadffmbdjdnnnpdmackjpoieokimphbn
+```
 
 ## Public Contact
 
@@ -47,8 +39,8 @@ Use `Bullet Bridge` if the Chrome Web Store developer dashboard allows it.
 All committed screenshots are real Bullet Bridge UI captures from demo mode at
 `1280x800`.
 
-Before Chrome Web Store submission, capture screenshot 5 from the real browser
-right-click menu. Do not mock or generate it.
+Screenshot 5 is captured from the real browser right-click menu. Do not mock or
+generate Chrome Web Store screenshots.
 
 ## Privacy Policy
 
