@@ -25,6 +25,7 @@ const state = {
   selectedStreamId: "all",
   activeView: "pushes",
   mirroredNotifications: [],
+  encryption: null,
   uploadStatus: null,
   draftLink: null,
   pushSearchQuery: "",
@@ -33,6 +34,7 @@ const state = {
 
 const STATUS_REFRESH_DELAYS = [400, 1200, 2500];
 const FILE_TRANSFER_CHANNEL = "bullet-bridge-file-transfer";
+const PERSISTENT_WINDOW_DRAFT_KEY = "persistentPopupDraft";
 const PUSH_PAGE_SIZE = 50;
 const FEEDBACK_TIMEOUT_MS = 2600;
 const ERROR_FEEDBACK_TIMEOUT_MS = 5200;
@@ -46,8 +48,13 @@ let pendingFileTransfer = null;
 let feedbackTimer = 0;
 let demoMode = false;
 let demoState = null;
+const standaloneMode = new URLSearchParams(window.location.search).get("window") === "1";
+
+document.documentElement.classList.toggle("standalone-mode", standaloneMode);
+document.body.classList.toggle("standalone-mode", standaloneMode);
 
 const elements = {
+  openWindowButton: document.querySelector("#openWindowButton"),
   optionsButton: document.querySelector("#optionsButton"),
   setupPanel: document.querySelector("#setupPanel"),
   setupSignInButton: document.querySelector("#setupSignInButton"),
@@ -82,6 +89,7 @@ const elements = {
 };
 
 document.addEventListener("DOMContentLoaded", init);
+elements.openWindowButton.addEventListener("click", openPersistentWindow);
 elements.optionsButton.addEventListener("click", openOptions);
 elements.setupSignInButton.addEventListener("click", signInWithPushbullet);
 elements.setupButton.addEventListener("click", openOptions);
@@ -109,14 +117,23 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
     state.mirroredNotifications = changes.mirroredNotifications.newValue || [];
     renderNotifications();
   }
+  if (areaName === "local" && changes.encryptionIssue) {
+    state.encryption = {
+      ...(state.encryption || {}),
+      issue: changes.encryptionIssue.newValue || null
+    };
+    renderNotifications();
+  }
 });
 
 async function init() {
   try {
+    elements.openWindowButton.classList.toggle("hidden", standaloneMode);
     demoMode = await isDemoModeEnabled();
     demoState = demoMode ? createDemoState() : null;
     const currentState = await request("getState");
     renderState(currentState);
+    await restorePersistentWindowDraft();
     if (!demoMode) {
       await request("clearUnread");
       scheduleConnectionStatusRefresh(currentState);
@@ -126,11 +143,67 @@ async function init() {
   }
 }
 
+async function openPersistentWindow() {
+  const draft = {
+    body: elements.bodyInput.value,
+    deviceIden: elements.deviceSelect.value,
+    activeView: state.activeView,
+    draftLink: state.draftLink
+  };
+
+  elements.openWindowButton.disabled = true;
+  try {
+    await chrome.storage.session.set({ [PERSISTENT_WINDOW_DRAFT_KEY]: draft });
+    const url = new URL(window.location.href);
+    url.searchParams.set("window", "1");
+    await chrome.windows.create({
+      url: url.href,
+      type: "popup",
+      focused: true,
+      width: 820,
+      height: 680
+    });
+    window.close();
+  } catch (error) {
+    await chrome.storage.session.remove(PERSISTENT_WINDOW_DRAFT_KEY);
+    elements.openWindowButton.disabled = false;
+    setFeedback(error.message || "Unable to open Bullet Bridge in a window.", true);
+  }
+}
+
+async function restorePersistentWindowDraft() {
+  if (!standaloneMode) {
+    return;
+  }
+
+  const stored = await chrome.storage.session.get(PERSISTENT_WINDOW_DRAFT_KEY);
+  const draft = stored[PERSISTENT_WINDOW_DRAFT_KEY];
+  await chrome.storage.session.remove(PERSISTENT_WINDOW_DRAFT_KEY);
+  if (!draft || typeof draft !== "object") {
+    return;
+  }
+
+  elements.bodyInput.value = String(draft.body || "");
+  state.draftLink = draft.draftLink && typeof draft.draftLink === "object" ? draft.draftLink : null;
+
+  const deviceIden = String(draft.deviceIden || "");
+  if (!deviceIden || state.devices.some((device) => device.iden === deviceIden)) {
+    elements.deviceSelect.value = deviceIden;
+    state.selectedStreamId = deviceIden ? streamIdForDevice(deviceIden) : "all";
+  }
+
+  const activeView = draft.activeView === "notifications" ? "notifications" : "pushes";
+  switchView(activeView);
+  renderStreams();
+  renderSelectedStream();
+}
+
 function renderState(currentState) {
   state.settings = currentState.settings;
   state.devices = currentState.devices || [];
   state.localDeviceIden = currentState.localDevice?.iden || "";
   state.mirroredNotifications = currentState.mirroredNotifications || [];
+  state.encryption = currentState.encryption || null;
   state.uploadStatus = currentState.uploadStatus || null;
   const loggedOut = !currentState.hasToken;
 
@@ -1482,12 +1555,17 @@ function renderNotifications() {
     ? `Notifications (${notifications.length})`
     : "Notifications";
 
+  const children = [];
+  if (state.encryption?.issue?.message) {
+    children.push(encryptionNotice(state.encryption.issue.message));
+  }
   if (!notifications.length) {
-    elements.notificationList.replaceChildren(emptyState("No mirrored notifications yet."));
+    children.push(emptyState("No mirrored notifications yet."));
+    elements.notificationList.replaceChildren(...children);
     return;
   }
 
-  elements.notificationList.replaceChildren(...notifications.map((notification) => {
+  children.push(...notifications.map((notification) => {
     const item = document.createElement("article");
     item.className = "notification-item";
     item.classList.toggle("dismissed", Boolean(notification.dismissed));
@@ -1544,6 +1622,24 @@ function renderNotifications() {
 
     return item;
   }));
+  elements.notificationList.replaceChildren(...children);
+}
+
+function encryptionNotice(message) {
+  const notice = document.createElement("div");
+  notice.className = "encryption-notice";
+
+  const text = document.createElement("p");
+  text.textContent = message;
+
+  const button = document.createElement("button");
+  button.className = "secondary compact";
+  button.type = "button";
+  button.textContent = "Open Settings";
+  button.addEventListener("click", openOptions);
+
+  notice.append(text, button);
+  return notice;
 }
 
 async function removeNotification(notificationId) {

@@ -18,6 +18,9 @@ Bullet Bridge stores configuration in `chrome.storage.local` for this extension.
 - Local unread count.
 - Recent mirrored Android notification records.
 - Temporary file upload status.
+- A derived, non-extractable end-to-end encryption key in extension-local IndexedDB when the user enables this optional feature.
+
+The end-to-end encryption password is never stored or sent. It is used locally to derive the key. Only the derived key's SHA-256 fingerprint is registered with the user's Bullet Bridge device through Pushbullet.
 
 ## Network Requests
 
@@ -43,10 +46,14 @@ Depending on the features you use, Bullet Bridge can handle:
 
 This data is used only to provide extension functionality: showing the UI, sending pushes, uploading selected files, displaying notifications, and opening links you request.
 
+## End-to-End Encryption
+
+When enabled, Bullet Bridge uses Pushbullet's documented end-to-end encryption protocol to decrypt mirrored Android notifications and encrypt their dismissal messages. Authentication tags are verified before notification content is accepted. A notification that cannot be authenticated or decrypted is discarded and not displayed.
+
+Pushbullet end-to-end encryption applies to mirrored notifications and related ephemeral messages. It does not apply to normal notes, links, files, or push history. Those features continue to use Pushbullet's HTTPS API and Pushbullet-provided upload endpoints.
+
+After decryption, recent mirrored notification content is stored locally in the extension so it can appear in the Notifications tab. Users can remove individual records, clear all notification records, or clear the connected account from Bullet Bridge settings.
+
 ## No Analytics
 
 Bullet Bridge does not include analytics, ads, trackers, telemetry, remote code execution, or third-party reporting services.
-
-## Public Release Note
-
-This document describes the local development build. A Chrome Web Store release should publish a hosted privacy policy with the final extension ID, contact information, and store-compliant disclosure wording.

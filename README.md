@@ -8,7 +8,14 @@ Bullet Bridge is an independent, unofficial client for Pushbullet users. It is n
 
 This repository is source-available for transparency and user trust. It is not open source in the OSI sense, and the license does not allow republishing modified copies or submitting derivative browser extensions to extension stores without permission.
 
-Install Bullet Bridge from the Chrome Web Store:
+> [!IMPORTANT]
+> **Release availability:** Bullet Bridge v0.5.0 is available from GitHub while
+> access to the Chrome Web Store publisher account is being restored. The
+> Chrome Web Store currently remains on v0.4.1; existing Web Store
+> installations continue to work. GitHub installations must be updated
+> manually.
+
+Install the current Chrome Web Store release (v0.4.1):
 
 https://chromewebstore.google.com/detail/bullet-bridge/iadffmbdjdnnnpdmackjpoieokimphbn
 
@@ -24,6 +31,7 @@ ibhimmdnfbnhjdidoofgmlmngjdbneal
 - Save and test a Pushbullet access token as a manual fallback.
 - Register this browser as a Pushbullet device with a browser-specific name, such as `Bullet Bridge (Brave)`.
 - Send notes, links, current-tab links, and files.
+- Open the popup in a persistent window when a Linux compositor closes browser-action popups during file selection.
 - Send to all devices or a selected device.
 - Browse recent push history in a chat-style popup.
 - Load older pushes on demand.
@@ -36,10 +44,20 @@ ibhimmdnfbnhjdidoofgmlmngjdbneal
 - Receive Pushbullet websocket events.
 - Show received pushes as browser notifications.
 - Show mirrored Android notifications in the popup and as browser notifications.
+- Decrypt Pushbullet end-to-end encrypted mirrored notifications using a locally derived, non-extractable key.
+- Encrypt mirrored-notification dismissals when end-to-end encryption is enabled.
 - Open or dismiss pushes from browser notification action buttons.
 - Dismiss mirrored Android notifications from browser notification action buttons.
 - Clear individual mirrored notifications or clear all local mirrored notifications.
 - Open pushed links from browser notifications.
+
+## End-to-End Encryption
+
+Bullet Bridge supports Pushbullet's end-to-end encryption protocol for mirrored Android notifications and their dismissal messages. Enable end-to-end encryption in the Pushbullet Android app first, then enter the same encryption password in Bullet Bridge settings.
+
+The password is used only to derive the encryption key locally. It is never stored or sent. Bullet Bridge stores the derived key as a non-extractable Web Crypto key in extension-local IndexedDB and registers only its SHA-256 fingerprint with the Bullet Bridge Pushbullet device.
+
+Pushbullet's protocol does not apply end-to-end encryption to ordinary notes, links, files, or push history. Those continue to use Pushbullet's HTTPS API. Decrypted mirrored notification records are kept locally so they can be shown in the Notifications tab, and can be cleared there or by clearing the Bullet Bridge account.
 
 ## Screenshots
 
@@ -65,26 +83,40 @@ https://bulletbridge.github.io/bullet-bridge/privacy.html
 
 ## Install From Chrome Web Store
 
-Install the published extension:
+Install the currently published v0.4.1 extension:
 
 https://chromewebstore.google.com/detail/bullet-bridge/iadffmbdjdnnnpdmackjpoieokimphbn
 
 ## Install From GitHub
 
-1. Download and extract this repository, or clone it:
+The GitHub and Chrome Web Store builds have different extension IDs. Before
+installing the GitHub build, disable or remove the Web Store build to avoid
+duplicate devices and notifications. Extension settings and sign-in state do
+not transfer between the two builds.
+
+1. Download `bullet-bridge-0.5.0.zip` from the
+   [v0.5.0 GitHub release](https://github.com/bulletbridge/bullet-bridge/releases/tag/v0.5.0).
+2. Extract the zip to a permanent folder. Do not delete that folder after
+   loading the extension.
+3. Open `brave://extensions` or `chrome://extensions`.
+4. Enable `Developer mode`.
+5. Click `Load unpacked`.
+6. Select the extracted folder that contains `manifest.json`.
+7. Open Bullet Bridge, click `Sign In`, and approve Bullet Bridge on the
+   Pushbullet authorization page.
+
+To update a GitHub installation, download the newer release zip, replace the
+files in the same permanent folder, and click `Reload` for Bullet Bridge on the
+browser extensions page.
+
+Developers can instead clone the repository:
 
    ```bash
    git clone https://github.com/bulletbridge/bullet-bridge.git
    ```
 
-2. Open `brave://extensions` or `chrome://extensions`.
-3. Enable `Developer mode`.
-4. Click `Load unpacked`.
-5. Select the extracted or cloned `bullet-bridge` folder that contains `manifest.json`.
-6. Open Bullet Bridge and click `Sign In`.
-7. Approve Bullet Bridge on the Pushbullet authorization page.
-
-After updating an already-loaded copy, reload the extension on `brave://extensions`. If device state looks stale, click `Refresh Devices` in options.
+If device state looks stale after an update, click `Refresh Devices` in
+options.
 
 Get a personal Pushbullet access token from:
 
@@ -171,10 +203,6 @@ Bullet Bridge is source-available under the [Bullet Bridge Source Available Lice
 You may inspect the source, audit privacy-sensitive behavior, and install official Bullet Bridge releases. You may not redistribute modified versions, publish derivative browser extensions, or use Bullet Bridge branding without permission.
 
 See [TRADEMARK.md](TRADEMARK.md) for Bullet Bridge branding and Pushbullet compatibility wording.
-
-## Release Status
-
-Bullet Bridge is published on the Chrome Web Store and available as a GitHub/unpacked build. The current source version is `0.4.1`.
 
 ## Disclaimer
 

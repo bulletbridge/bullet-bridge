@@ -43,6 +43,16 @@ html.setup-mode {
   height: 250px;
 }
 
+html.standalone-mode,
+html.standalone-mode.setup-mode,
+.popup.standalone-mode,
+.popup.standalone-mode.setup-mode {
+  width: 100vw;
+  height: 100vh;
+  min-width: 680px;
+  min-height: 480px;
+}
+
 .topbar {
   display: flex;
   align-items: center;
@@ -60,6 +70,12 @@ html.setup-mode {
   font-size: 16px;
   font-weight: 700;
   line-height: 28px;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .popup main {
@@ -956,6 +972,28 @@ button.file-preview:hover {
   border-radius: 7px;
   padding: 10px;
   background: color-mix(in srgb, var(--panel) 94%, var(--bg));
+}
+
+.encryption-notice {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid color-mix(in srgb, var(--danger) 45%, var(--border));
+  border-radius: 7px;
+  padding: 10px;
+  background: color-mix(in srgb, var(--danger) 8%, var(--panel));
+}
+
+.encryption-notice p {
+  margin: 0;
+  color: var(--text);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.encryption-notice button {
+  white-space: nowrap;
 }
 
 .notification-item-heading {

@@ -75,7 +75,7 @@
     <main>
       <header>
         <h1>Bullet Bridge Privacy Policy</h1>
-        <p>Last updated: July 7, 2026</p>
+        <p>Last updated: July 17, 2026</p>
       </header>
 
       <p class="note">
@@ -100,7 +100,17 @@
         <li>Local unread count.</li>
         <li>Recent mirrored Android notification records.</li>
         <li>Temporary file upload status.</li>
+        <li>
+          A derived, non-extractable end-to-end encryption key in
+          extension-local IndexedDB when the user enables this optional
+          feature.
+        </li>
       </ul>
+      <p>
+        The end-to-end encryption password is never stored or sent. It is used
+        locally to derive the key. Only the derived key's SHA-256 fingerprint
+        is registered with the user's Bullet Bridge device through Pushbullet.
+      </p>
 
       <h2>Network Requests</h2>
       <p>
@@ -133,6 +143,27 @@
         This data is used only to provide extension functionality: showing the
         UI, sending pushes, uploading selected files, displaying notifications,
         opening links you request, and searching loaded push history locally.
+      </p>
+
+      <h2>End-to-End Encryption</h2>
+      <p>
+        When enabled, Bullet Bridge uses Pushbullet's documented end-to-end
+        encryption protocol to decrypt mirrored Android notifications and
+        encrypt their dismissal messages. Authentication tags are verified
+        before notification content is accepted. A notification that cannot be
+        authenticated or decrypted is discarded and not displayed.
+      </p>
+      <p>
+        Pushbullet end-to-end encryption applies to mirrored notifications and
+        related ephemeral messages. It does not apply to normal notes, links,
+        files, or push history. Those features continue to use Pushbullet's
+        HTTPS API and Pushbullet-provided upload endpoints.
+      </p>
+      <p>
+        After decryption, recent mirrored notification content is stored
+        locally in the extension so it can appear in the Notifications tab.
+        Users can remove individual records, clear all notification records,
+        or clear the connected account from Bullet Bridge settings.
       </p>
 
       <h2>No Analytics Or Tracking</h2>

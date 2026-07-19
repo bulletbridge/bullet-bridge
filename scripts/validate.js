@@ -16,6 +16,8 @@ const requiredFiles = [
   "src/shared/context-menu.js",
   "src/shared/demo-data.js",
   "src/shared/device-cleanup.js",
+  "src/shared/e2e-crypto.js",
+  "src/shared/e2e-key-store.js",
   "src/shared/mirrored-notifications.js",
   "src/shared/push-search.js",
   "src/shared/storage.js",

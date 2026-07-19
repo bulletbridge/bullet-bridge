@@ -119,6 +119,11 @@ export function createDemoState() {
     },
     cursor: "older",
     uploadStatus: null,
+    encryption: {
+      enabled: true,
+      fingerprint: "demo",
+      issue: null
+    },
     mirroredNotifications: DEMO_NOTIFICATIONS,
     demoPushes: DEMO_PUSHES
   });

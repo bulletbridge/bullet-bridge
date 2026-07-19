@@ -32,14 +32,29 @@ import {
 } from "./shared/device-cleanup.js";
 
 import {
+  decryptPushbulletPayload,
+  derivePushbulletEncryptionKey,
+  encryptionFingerprintMatchesPeers,
+  encryptPushbulletPayload,
+  isEncryptedPushbulletPayload
+} from "./shared/e2e-crypto.js";
+
+import {
+  clearEncryptionKeyStore,
+  deleteEncryptionKeyRecord,
+  getEncryptionKeyRecord,
+  storeEncryptionKeyRecord
+} from "./shared/e2e-key-store.js";
+
+import {
   findMirroredNotificationIds,
-  makeMirrorNotificationId
+  makeMirrorNotificationId,
+  removeMirroredNotificationState
 } from "./shared/mirrored-notifications.js";
 
 import {
   DEFAULT_SETTINGS,
   STORE_KEYS,
-  forgetNotification,
   getNotificationMap,
   getSettings,
   getStatus,
@@ -66,6 +81,7 @@ const OAUTH_AUTHORIZE_URL = "https://www.pushbullet.com/authorize";
 let socket = null;
 let reconnectTimer = null;
 let syncInProgress = false;
+let streamMessageQueue = Promise.resolve();
 let fileTransferChannel = null;
 const pendingFileTransfers = new Map();
 
@@ -93,7 +109,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   handleMessage(message, sender)
     .then((result) => sendResponse({ ok: true, result }))
     .catch((error) => {
-      console.error(error);
+      console.warn(error.message || String(error));
       sendResponse({ ok: false, error: error.message || String(error) });
     });
 
@@ -137,6 +153,10 @@ async function handleMessage(message, sender) {
       return cleanupOldDevices();
     case "saveSettings":
       return saveSettings(message.settings || {});
+    case "setEncryptionPassword":
+      return setEncryptionPassword(message.password);
+    case "clearEncryption":
+      return clearEncryption();
     case "sendPush":
       return sendPush(message.push || {});
     case "deletePush":
@@ -188,9 +208,24 @@ async function getState() {
     STORE_KEYS.unreadCount,
     STORE_KEYS.cursor,
     STORE_KEYS.uploadStatus,
-    STORE_KEYS.mirroredNotifications
+    STORE_KEYS.mirroredNotifications,
+    STORE_KEYS.encryptionIssue
   ]);
   const status = await getLiveStatus();
+  const me = stored[STORE_KEYS.me] || null;
+  let encryptionRecord = null;
+  let encryptionIssue = stored[STORE_KEYS.encryptionIssue] || null;
+  if (me?.iden) {
+    try {
+      encryptionRecord = await getEncryptionKeyRecord(me.iden);
+    } catch (error) {
+      encryptionIssue = {
+        reason: "storage_error",
+        message: "Unable to access the local end-to-end encryption key.",
+        updatedAt: new Date().toISOString()
+      };
+    }
+  }
 
   return {
     hasToken: Boolean(stored[STORE_KEYS.token]),
@@ -200,7 +235,7 @@ async function getState() {
     oauthClientId: stored[STORE_KEYS.oauthClientId] || "",
     oauthClientIdBuiltIn: Boolean(PUSHBULLET_OAUTH_CLIENT_ID.trim()),
     oauthRedirectUri: getOAuthRedirectUri(),
-    me: stored[STORE_KEYS.me] || null,
+    me,
     devices: stored[STORE_KEYS.devices] || [],
     localDevice: stored[STORE_KEYS.localDevice] || null,
     unreadCount: Number(stored[STORE_KEYS.unreadCount] || 0),
@@ -208,7 +243,12 @@ async function getState() {
     status,
     cursor: stored[STORE_KEYS.cursor] || null,
     uploadStatus: stored[STORE_KEYS.uploadStatus] || null,
-    mirroredNotifications: stored[STORE_KEYS.mirroredNotifications] || []
+    mirroredNotifications: stored[STORE_KEYS.mirroredNotifications] || [],
+    encryption: {
+      enabled: Boolean(encryptionRecord?.key),
+      fingerprint: encryptionRecord?.fingerprint || "",
+      issue: encryptionIssue
+    }
   };
 }
 
@@ -318,11 +358,18 @@ async function saveToken(token, options = {}) {
     websocketState: "testing"
   });
 
+  const previous = await getStorage(STORE_KEYS.me);
   const [me, initialDevices] = await Promise.all([
     getMe(cleanToken),
     getDevices(cleanToken)
   ]);
-  const { localDevice, devices } = await ensureLocalDevice(cleanToken, initialDevices);
+  let { localDevice, devices } = await ensureLocalDevice(cleanToken, initialDevices);
+  ({ localDevice, devices } = await applyStoredEncryptionFingerprint(
+    cleanToken,
+    me.iden,
+    localDevice,
+    devices
+  ));
 
   await setStorage({
     [STORE_KEYS.token]: cleanToken,
@@ -336,6 +383,12 @@ async function saveToken(token, options = {}) {
     }
   });
 
+  const previousUserIden = String(previous[STORE_KEYS.me]?.iden || "").trim();
+  if (previousUserIden && previousUserIden !== me.iden) {
+    await deleteEncryptionKeyRecord(previousUserIden);
+    await removeStorage(STORE_KEYS.encryptionIssue);
+  }
+
   await bootstrapPushCursor(cleanToken);
   await installContextMenus();
   await reconnectNow();
@@ -345,6 +398,12 @@ async function saveToken(token, options = {}) {
 
 async function clearToken() {
   closeSocket();
+  const account = await getStorage([
+    STORE_KEYS.token,
+    STORE_KEYS.me,
+    STORE_KEYS.localDevice
+  ]);
+  await clearAccountEncryption(account);
   await removeStorage([
     STORE_KEYS.token,
     STORE_KEYS.authMethod,
@@ -356,7 +415,8 @@ async function clearToken() {
     STORE_KEYS.mirroredNotifications,
     STORE_KEYS.suppressedPushes,
     STORE_KEYS.unreadCount,
-    STORE_KEYS.uploadStatus
+    STORE_KEYS.uploadStatus,
+    STORE_KEYS.encryptionIssue
   ]);
   await refreshBadge();
   await setStatus({
@@ -370,8 +430,15 @@ async function clearToken() {
 
 async function refreshDevices() {
   const token = await requireToken();
+  const stored = await getStorage(STORE_KEYS.me);
   const initialDevices = await getDevices(token);
-  const { localDevice, devices } = await ensureLocalDevice(token, initialDevices);
+  let { localDevice, devices } = await ensureLocalDevice(token, initialDevices);
+  ({ localDevice, devices } = await applyStoredEncryptionFingerprint(
+    token,
+    stored[STORE_KEYS.me]?.iden,
+    localDevice,
+    devices
+  ));
   await setStorage({
     [STORE_KEYS.devices]: devices,
     [STORE_KEYS.localDevice]: localDevice
@@ -413,6 +480,115 @@ async function cleanupOldDevices() {
 async function saveSettings(settingsPatch) {
   const settings = await updateSettings(settingsPatch);
   return { settings };
+}
+
+async function setEncryptionPassword(password) {
+  const cleanPassword = String(password || "");
+  if (!cleanPassword) {
+    throw new Error("Enter the end-to-end encryption password used by your other Pushbullet devices.");
+  }
+
+  const token = await requireToken();
+  const stored = await getStorage(STORE_KEYS.me);
+  const userIden = String(stored[STORE_KEYS.me]?.iden || "").trim();
+  if (!userIden) {
+    throw new Error("Connect a Pushbullet account before enabling end-to-end encryption.");
+  }
+
+  const initialDevices = await getDevices(token);
+  const { localDevice, devices } = await ensureLocalDevice(token, initialDevices);
+  const material = await derivePushbulletEncryptionKey(cleanPassword, userIden);
+  validateEncryptionFingerprint(material.fingerprint, devices, localDevice.iden);
+
+  const previousFingerprint = localDevice.key_fingerprint || null;
+  const updatedLocalDevice = await updateDevice(token, localDevice.iden, {
+    key_fingerprint: material.fingerprint
+  });
+
+  try {
+    await storeEncryptionKeyRecord({
+      userIden,
+      key: material.key,
+      fingerprint: material.fingerprint
+    });
+  } catch (error) {
+    try {
+      await updateDevice(token, localDevice.iden, {
+        key_fingerprint: previousFingerprint
+      });
+    } catch (rollbackError) {
+      console.error("Unable to restore the previous Pushbullet encryption fingerprint.", rollbackError);
+    }
+    throw error;
+  }
+
+  await setStorage({
+    [STORE_KEYS.localDevice]: updatedLocalDevice,
+    [STORE_KEYS.devices]: sortDevices(replaceDevice(devices, updatedLocalDevice))
+  });
+  await clearEncryptionIssue();
+  return getState();
+}
+
+async function clearEncryption() {
+  const token = await requireToken();
+  const stored = await getStorage([
+    STORE_KEYS.me,
+    STORE_KEYS.localDevice,
+    STORE_KEYS.devices
+  ]);
+  const userIden = String(stored[STORE_KEYS.me]?.iden || "").trim();
+  if (!userIden) {
+    throw new Error("No connected Pushbullet account was found.");
+  }
+
+  const localDevice = stored[STORE_KEYS.localDevice];
+  let updatedLocalDevice = localDevice;
+  if (localDevice?.iden) {
+    updatedLocalDevice = await updateDevice(token, localDevice.iden, {
+      key_fingerprint: null
+    });
+  }
+
+  await deleteEncryptionKeyRecord(userIden);
+  await clearEncryptionIssue();
+  if (updatedLocalDevice?.iden) {
+    await setStorage({
+      [STORE_KEYS.localDevice]: updatedLocalDevice,
+      [STORE_KEYS.devices]: sortDevices(replaceDevice(stored[STORE_KEYS.devices] || [], updatedLocalDevice))
+    });
+  }
+  return getState();
+}
+
+function validateEncryptionFingerprint(fingerprint, devices, localDeviceIden) {
+  if (!encryptionFingerprintMatchesPeers(fingerprint, devices, localDeviceIden)) {
+    throw new Error("That password does not match the end-to-end encryption key used by your other Pushbullet devices.");
+  }
+}
+
+async function clearAccountEncryption(account) {
+  const token = normalizeToken(account[STORE_KEYS.token]);
+  const userIden = String(account[STORE_KEYS.me]?.iden || "").trim();
+  const localDevice = account[STORE_KEYS.localDevice];
+
+  if (token && localDevice?.iden) {
+    try {
+      await updateDevice(token, localDevice.iden, { key_fingerprint: null });
+    } catch (error) {
+      console.warn("Unable to clear the Pushbullet device encryption fingerprint while disconnecting.", error);
+    }
+  }
+
+  try {
+    if (userIden) {
+      await deleteEncryptionKeyRecord(userIden);
+    } else {
+      await clearEncryptionKeyStore();
+    }
+  } catch (error) {
+    console.error("Unable to clear the local encryption key.", error);
+  }
 }
 
 async function sendPush(rawPush) {
@@ -1002,7 +1178,11 @@ function connectWebSocket(token) {
   });
 
   socket.addEventListener("message", (event) => {
-    handleStreamMessage(event.data).catch(console.error);
+    streamMessageQueue = streamMessageQueue
+      .then(() => handleStreamMessage(event.data))
+      .catch((error) => {
+        console.error(error);
+      });
   });
 
   socket.addEventListener("error", () => {
@@ -1064,8 +1244,92 @@ async function handleStreamMessage(rawData) {
   }
 
   if (data.type === "push" && data.push) {
-    await handleEphemeralPush(data.push);
+    const processed = await processIncomingEphemeral(data.push);
+    if (processed) {
+      await handleEphemeralPush(processed.push, {
+        encrypted: processed.encrypted
+      });
+    }
   }
+}
+
+async function processIncomingEphemeral(push) {
+  if (push?.encrypted !== true) {
+    return { push, encrypted: false };
+  }
+
+  if (!isEncryptedPushbulletPayload(push)) {
+    await setEncryptionIssue(
+      "invalid_payload",
+      "Pushbullet sent an encrypted notification in an unsupported format."
+    );
+    return null;
+  }
+
+  const stored = await getStorage(STORE_KEYS.me);
+  const userIden = String(stored[STORE_KEYS.me]?.iden || "").trim();
+  if (!userIden) {
+    await setEncryptionIssue(
+      "not_configured",
+      "An encrypted notification was received before the Pushbullet account finished loading."
+    );
+    return null;
+  }
+
+  let record;
+  try {
+    record = await getEncryptionKeyRecord(userIden);
+  } catch (error) {
+    await setEncryptionIssue(
+      "storage_error",
+      "Bullet Bridge could not access the local end-to-end encryption key."
+    );
+    return null;
+  }
+
+  if (!record?.key) {
+    await setEncryptionIssue(
+      "not_configured",
+      "An encrypted notification could not be shown. Enter your Pushbullet end-to-end encryption password in settings."
+    );
+    return null;
+  }
+
+  try {
+    const decrypted = await decryptPushbulletPayload(push.ciphertext, record.key);
+    await clearEncryptionIssue();
+    return {
+      push: decrypted,
+      encrypted: true
+    };
+  } catch (error) {
+    await setEncryptionIssue(
+      error.code === "invalid_format" ? "invalid_payload" : "decryption_failed",
+      error.code === "invalid_format"
+        ? "Pushbullet sent an encrypted notification in an unsupported format."
+        : "An encrypted notification could not be decrypted. Check that the password matches your other devices."
+    );
+    return null;
+  }
+}
+
+async function setEncryptionIssue(reason, message) {
+  const stored = await getStorage(STORE_KEYS.encryptionIssue);
+  const existing = stored[STORE_KEYS.encryptionIssue];
+  if (existing?.reason === reason && existing?.message === message) {
+    return;
+  }
+  await setStorage({
+    [STORE_KEYS.encryptionIssue]: {
+      reason,
+      message,
+      updatedAt: new Date().toISOString()
+    }
+  });
+}
+
+async function clearEncryptionIssue() {
+  await removeStorage(STORE_KEYS.encryptionIssue);
 }
 
 async function bootstrapPushCursor(token) {
@@ -1146,15 +1410,13 @@ async function syncPushes() {
   }
 }
 
-async function handleEphemeralPush(push) {
+async function handleEphemeralPush(push, context = {}) {
   if (push.type === "dismissal") {
     const notificationIds = await findStoredMirroredNotificationIds(push);
-    await Promise.all(notificationIds.map((notificationId) => (
-      removeMirroredNotificationRecord(notificationId, {
-        clearSystemNotification: true,
-        decrementBadge: true
-      })
-    )));
+    await removeMirroredNotificationRecords(notificationIds, {
+      clearSystemNotification: true,
+      decrementBadge: true
+    });
     return;
   }
 
@@ -1177,12 +1439,13 @@ async function handleEphemeralPush(push) {
 
   if (push.dismissed) {
     const notificationIds = await findStoredMirroredNotificationIds(push);
-    await Promise.all((notificationIds.length ? notificationIds : [notificationId]).map((id) => (
-      removeMirroredNotificationRecord(id, {
+    await removeMirroredNotificationRecords(
+      notificationIds.length ? notificationIds : [notificationId],
+      {
         clearSystemNotification: true,
         decrementBadge: true
-      })
-    )));
+      }
+    );
     return;
   }
 
@@ -1202,7 +1465,7 @@ async function handleEphemeralPush(push) {
     notificationOptions.buttons = buttonActions.map((action) => ({ title: labelForNotificationAction(action) }));
   }
 
-  await rememberMirroredNotification(notificationId, push);
+  await rememberMirroredNotification(notificationId, push, context);
 
   await chrome.notifications.create(notificationId, notificationOptions);
 
@@ -1215,6 +1478,7 @@ async function handleEphemeralPush(push) {
     notificationId: push.notification_id ?? "",
     notificationTag: push.notification_tag ?? null,
     dismissable: isMirrorDismissable(push),
+    encrypted: Boolean(context.encrypted),
     badgeCounted: true,
     createdAt: new Date().toISOString()
   });
@@ -1223,7 +1487,7 @@ async function handleEphemeralPush(push) {
   }
 }
 
-async function rememberMirroredNotification(notificationId, push) {
+async function rememberMirroredNotification(notificationId, push, context = {}) {
   const stored = await getStorage([
     STORE_KEYS.mirroredNotifications,
     STORE_KEYS.devices
@@ -1244,6 +1508,7 @@ async function rememberMirroredNotification(notificationId, push) {
     notificationId: push.notification_id ?? "",
     notificationTag: push.notification_tag ?? null,
     dismissable: isMirrorDismissable(push),
+    encrypted: Boolean(context.encrypted),
     sourceDevice,
     url: push.url || "",
     created: Number(push.created || push.notification_created || now),
@@ -1271,35 +1536,47 @@ async function removeMirroredNotificationRecord(notificationId, options = {}) {
     return { id: "", removed: false };
   }
 
+  const result = await removeMirroredNotificationRecords([id], options);
+  return {
+    id,
+    removed: result.removed > 0
+  };
+}
+
+async function removeMirroredNotificationRecords(notificationIds, options = {}) {
+  const ids = [...new Set((notificationIds || [])
+    .map((id) => String(id || "").trim())
+    .filter(Boolean))];
+  if (!ids.length) {
+    return { ids: [], removed: 0 };
+  }
+
   const stored = await getStorage([
     STORE_KEYS.notificationMap,
     STORE_KEYS.mirroredNotifications
   ]);
-  const notificationMap = stored[STORE_KEYS.notificationMap] || {};
-  const notifications = stored[STORE_KEYS.mirroredNotifications] || [];
-  const details = notificationMap[id] || null;
-  const notification = notifications.find((item) => item.id === id) || null;
-
-  if (details) {
-    delete notificationMap[id];
-  }
+  const nextState = removeMirroredNotificationState(
+    ids,
+    stored[STORE_KEYS.notificationMap] || {},
+    stored[STORE_KEYS.mirroredNotifications] || []
+  );
 
   await setStorage({
-    [STORE_KEYS.notificationMap]: notificationMap,
-    [STORE_KEYS.mirroredNotifications]: notifications.filter((item) => item.id !== id)
+    [STORE_KEYS.notificationMap]: nextState.notificationMap,
+    [STORE_KEYS.mirroredNotifications]: nextState.notifications
   });
 
   if (options.clearSystemNotification !== false) {
-    await chrome.notifications.clear(id);
+    await Promise.all(nextState.ids.map((id) => chrome.notifications.clear(id)));
   }
 
-  if (options.decrementBadge && (details?.badgeCounted || notification?.dismissed === false)) {
-    await decrementUnreadBadge();
+  if (options.decrementBadge && nextState.badgeDecrement) {
+    await setUnreadCount((await getUnreadCount()) - nextState.badgeDecrement);
   }
 
   return {
-    id,
-    removed: Boolean(details || notification)
+    ids: nextState.ids,
+    removed: nextState.removed
   };
 }
 
@@ -1309,25 +1586,21 @@ async function removeMirroredNotification(notificationId) {
     throw new Error("Notification id is missing.");
   }
 
-  await removeMirroredNotificationRecord(id, {
-    clearSystemNotification: true,
-    decrementBadge: false
-  });
+  await dismissMirroredNotification(id);
   return { id };
 }
 
 async function clearMirroredNotifications() {
   const stored = await getStorage(STORE_KEYS.mirroredNotifications);
   const notifications = stored[STORE_KEYS.mirroredNotifications] || [];
-  await Promise.all(notifications.map(async (notification) => {
-    if (!notification.id) {
-      return;
+  const result = await removeMirroredNotificationRecords(
+    notifications.map((notification) => notification.id),
+    {
+      clearSystemNotification: true,
+      decrementBadge: false
     }
-    await chrome.notifications.clear(notification.id);
-    await forgetNotification(notification.id);
-  }));
-  await setStorage({ [STORE_KEYS.mirroredNotifications]: [] });
-  return { cleared: notifications.length };
+  );
+  return { cleared: result.removed };
 }
 
 async function notifyStoredPush(push) {
@@ -1614,13 +1887,25 @@ async function dismissMirroredNotification(notificationId, fallback = null) {
   }
 
   const token = await requireToken();
-  await createEphemeral(token, {
+  let dismissal = {
     type: "dismissal",
     package_name: packageName,
     notification_id: String(notificationPushId),
     notification_tag: notification.notificationTag ?? null,
     source_user_iden: sourceUserIden
-  });
+  };
+
+  const encryptionRecord = await getEncryptionKeyRecord(sourceUserIden);
+  if (encryptionRecord?.key) {
+    dismissal = {
+      encrypted: true,
+      ciphertext: await encryptPushbulletPayload(dismissal, encryptionRecord.key)
+    };
+  } else if (notification.encrypted) {
+    throw new Error("The encryption key required to dismiss this notification is no longer available.");
+  }
+
+  await createEphemeral(token, dismissal);
   await removeMirroredNotificationRecord(notificationId, {
     clearSystemNotification: true,
     decrementBadge: false
@@ -1659,13 +1944,49 @@ async function refreshBadge() {
 }
 
 async function ensureLocalDeviceRegistered(token) {
+  const stored = await getStorage(STORE_KEYS.me);
   const initialDevices = await getDevices(token);
-  const { localDevice, devices } = await ensureLocalDevice(token, initialDevices);
+  let { localDevice, devices } = await ensureLocalDevice(token, initialDevices);
+  ({ localDevice, devices } = await applyStoredEncryptionFingerprint(
+    token,
+    stored[STORE_KEYS.me]?.iden,
+    localDevice,
+    devices
+  ));
   await setStorage({
     [STORE_KEYS.localDevice]: localDevice,
     [STORE_KEYS.devices]: devices
   });
   return localDevice;
+}
+
+async function applyStoredEncryptionFingerprint(token, userIden, localDevice, devices) {
+  const cleanUserIden = String(userIden || "").trim();
+  if (!cleanUserIden || !localDevice?.iden) {
+    return { localDevice, devices };
+  }
+
+  let record;
+  try {
+    record = await getEncryptionKeyRecord(cleanUserIden);
+  } catch (error) {
+    await setEncryptionIssue(
+      "storage_error",
+      "Bullet Bridge could not access the local end-to-end encryption key."
+    );
+    return { localDevice, devices };
+  }
+  if (!record?.fingerprint || localDevice.key_fingerprint === record.fingerprint) {
+    return { localDevice, devices };
+  }
+
+  const updatedLocalDevice = await updateDevice(token, localDevice.iden, {
+    key_fingerprint: record.fingerprint
+  });
+  return {
+    localDevice: updatedLocalDevice,
+    devices: sortDevices(replaceDevice(devices, updatedLocalDevice))
+  };
 }
 
 function hasLegacyLocalDeviceName(device) {
