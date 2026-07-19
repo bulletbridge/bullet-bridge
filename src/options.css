@@ -122,6 +122,52 @@
   border-top: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
 }
 
+.encryption-settings {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding-top: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+}
+
+.encryption-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.encryption-heading h3 {
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.encryption-heading p,
+.encryption-help {
+  margin-top: 3px;
+  font-size: 12px;
+}
+
+.encryption-settings .status-pill {
+  min-height: 24px;
+  padding: 3px 8px;
+}
+
+.encryption-setup {
+  display: grid;
+  gap: 10px;
+}
+
+.encryption-actions {
+  justify-content: flex-start !important;
+}
+
+#encryptionIssue:empty {
+  display: none;
+}
+
 .manual-token-card summary {
   color: var(--muted);
   cursor: pointer;

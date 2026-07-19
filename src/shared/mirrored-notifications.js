@@ -52,6 +52,37 @@ export function normalizeMirrorValue(value) {
   return value === undefined || value === null ? "" : String(value);
 }
 
+export function removeMirroredNotificationState(notificationIds, notificationMap = {}, notifications = []) {
+  const ids = [...new Set((notificationIds || [])
+    .map((id) => String(id || "").trim())
+    .filter(Boolean))];
+  const idSet = new Set(ids);
+  const nextNotificationMap = { ...notificationMap };
+  const notificationById = new Map(notifications.map((notification) => [notification.id, notification]));
+  let badgeDecrement = 0;
+  let removed = 0;
+
+  for (const id of ids) {
+    const details = notificationMap[id] || null;
+    const notification = notificationById.get(id) || null;
+    if (details || notification) {
+      removed += 1;
+    }
+    if (details?.badgeCounted || notification?.dismissed === false) {
+      badgeDecrement += 1;
+    }
+    delete nextNotificationMap[id];
+  }
+
+  return {
+    ids,
+    notificationMap: nextNotificationMap,
+    notifications: notifications.filter((notification) => !idSet.has(notification.id)),
+    badgeDecrement,
+    removed
+  };
+}
+
 function mirrorMatchScore(notification, push) {
   if (String(notification.packageName || "").trim() !== push.packageName) {
     return 0;

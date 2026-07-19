@@ -12,7 +12,8 @@ export const STORE_KEYS = {
   mirroredNotifications: "mirroredNotifications",
   suppressedPushes: "suppressedPushes",
   unreadCount: "unreadCount",
-  uploadStatus: "uploadStatus"
+  uploadStatus: "uploadStatus",
+  encryptionIssue: "encryptionIssue"
 };
 
 export const DEFAULT_SETTINGS = {

@@ -4,6 +4,21 @@
 
 Nothing yet.
 
+## 0.5.0 - 2026-07-19
+
+- Added optional Pushbullet end-to-end encryption support for mirrored Android
+  notifications and their dismissal messages.
+- Derived encryption keys locally using Pushbullet's documented PBKDF2 and
+  AES-256-GCM protocol without storing the password.
+- Stored the derived key as a non-extractable Web Crypto key in local
+  IndexedDB and registered only its fingerprint with Pushbullet.
+- Added clear setup status and decryption-error notices to settings and the
+  notification view.
+- Added an optional persistent popup window so native file selection does not
+  interrupt the send flow on Linux desktop environments.
+- Serialized realtime event handling and made mirrored-notification cleanup
+  atomic to prevent stale notifications during rapid mirror/dismissal events.
+
 ## 0.4.1 - 2026-07-08
 
 - Changed the Chrome Web Store package title to `Bullet Bridge for Pushbullet`

@@ -51,6 +51,42 @@
             </div>
           </div>
 
+          <section class="encryption-settings" aria-labelledby="encryptionHeading">
+            <div class="encryption-heading">
+              <div>
+                <h3 id="encryptionHeading">End-to-end encryption</h3>
+                <p class="muted">Decrypt mirrored notifications using the same password configured in Pushbullet on your phone.</p>
+              </div>
+              <span id="encryptionStatus" class="status-pill" data-state="offline">Not configured</span>
+            </div>
+
+            <div id="encryptionSetupFields" class="encryption-setup">
+              <label class="field">
+                <span>Pushbullet encryption password</span>
+                <input id="encryptionPasswordInput" type="password" autocomplete="off" spellcheck="false" placeholder="Enter the password used on your other devices">
+              </label>
+              <p class="muted encryption-help">The password is used to derive a local encryption key and is never stored or sent.</p>
+            </div>
+            <p id="encryptionIssue" class="feedback error" role="alert"></p>
+
+            <div class="actions encryption-actions">
+              <button id="enableEncryptionButton" class="secondary" type="button">
+                <svg class="button-icon" aria-hidden="true" viewBox="0 0 24 24">
+                  <rect x="4" y="10" width="16" height="11" rx="2"></rect>
+                  <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+                </svg>
+                <span>Enable Encryption</span>
+              </button>
+              <button id="clearEncryptionButton" class="secondary" type="button">
+                <svg class="button-icon" aria-hidden="true" viewBox="0 0 24 24">
+                  <rect x="4" y="10" width="16" height="11" rx="2"></rect>
+                  <path d="M8 10V7a4 4 0 0 1 7.5-2"></path>
+                </svg>
+                <span>Disable Encryption</span>
+              </button>
+            </div>
+          </section>
+
           <details class="manual-token-card">
             <summary>Manual token fallback</summary>
             <div class="manual-token-body">

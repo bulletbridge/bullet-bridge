@@ -28,6 +28,12 @@ const elements = {
   showMirroredNotifications: document.querySelector("#showMirroredNotifications"),
   openLinksOnNotificationClick: document.querySelector("#openLinksOnNotificationClick"),
   closeNotificationsAsDismiss: document.querySelector("#closeNotificationsAsDismiss"),
+  encryptionStatus: document.querySelector("#encryptionStatus"),
+  encryptionSetupFields: document.querySelector("#encryptionSetupFields"),
+  encryptionPasswordInput: document.querySelector("#encryptionPasswordInput"),
+  encryptionIssue: document.querySelector("#encryptionIssue"),
+  enableEncryptionButton: document.querySelector("#enableEncryptionButton"),
+  clearEncryptionButton: document.querySelector("#clearEncryptionButton"),
   cleanupOldDevicesButton: document.querySelector("#cleanupOldDevicesButton"),
   deviceCleanupHint: document.querySelector("#deviceCleanupHint"),
   deviceList: document.querySelector("#deviceList"),
@@ -55,6 +61,8 @@ elements.showPushNotifications.addEventListener("change", saveSettingsFromForm);
 elements.showMirroredNotifications.addEventListener("change", saveSettingsFromForm);
 elements.openLinksOnNotificationClick.addEventListener("change", saveSettingsFromForm);
 elements.closeNotificationsAsDismiss.addEventListener("change", saveSettingsFromForm);
+elements.enableEncryptionButton.addEventListener("click", enableEncryption);
+elements.clearEncryptionButton.addEventListener("click", disableEncryption);
 
 chrome.storage.onChanged.addListener((changes, areaName) => {
   if (demoMode || areaName !== "local") {
@@ -64,6 +72,7 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
   if ([
     "authMethod",
     "devices",
+    "encryptionIssue",
     "localDevice",
     "me",
     "settings",
@@ -132,8 +141,33 @@ function renderState(state) {
   elements.openLinksOnNotificationClick.checked = settings.openLinksOnNotificationClick !== false;
   elements.closeNotificationsAsDismiss.checked = Boolean(settings.closeNotificationsAsDismiss);
 
+  renderEncryptionState(state);
+
   renderDeviceCleanup(devices, state.localDevice);
   renderDevices(devices, state.localDevice?.iden || "");
+}
+
+function renderEncryptionState(state) {
+  const encryption = state.encryption || {};
+  const connected = Boolean(state.me);
+  const issue = encryption.issue?.message || "";
+  const needsAttention = Boolean(issue);
+  const enabled = Boolean(encryption.enabled);
+
+  elements.encryptionStatus.textContent = needsAttention
+    ? "Needs attention"
+    : enabled ? "Enabled" : "Not configured";
+  elements.encryptionStatus.dataset.state = needsAttention
+    ? "offline"
+    : enabled ? "online" : "connecting";
+  elements.encryptionSetupFields.classList.toggle("hidden", enabled);
+  elements.enableEncryptionButton.classList.toggle("hidden", enabled);
+  elements.clearEncryptionButton.classList.toggle("hidden", !enabled);
+  elements.encryptionPasswordInput.disabled = !connected || enabled;
+  elements.enableEncryptionButton.disabled = !connected;
+  elements.clearEncryptionButton.disabled = !connected || !enabled;
+  setButtonText(elements.enableEncryptionButton, "Enable Encryption");
+  elements.encryptionIssue.textContent = issue;
 }
 
 function accountStatusText(state) {
@@ -372,6 +406,49 @@ async function cleanupOldDevices() {
   }
 }
 
+async function enableEncryption() {
+  if (loading) {
+    return;
+  }
+
+  const password = elements.encryptionPasswordInput.value;
+  if (!password) {
+    showToast("Enter the encryption password used by your other Pushbullet devices.", true);
+    elements.encryptionPasswordInput.focus();
+    return;
+  }
+
+  setLoading(true);
+  try {
+    const state = await request("setEncryptionPassword", { password });
+    elements.encryptionPasswordInput.value = "";
+    renderState(state);
+    showToast("End-to-end encryption enabled.");
+  } catch (error) {
+    showToast(error.message, true);
+  } finally {
+    setLoading(false);
+  }
+}
+
+async function disableEncryption() {
+  if (loading) {
+    return;
+  }
+
+  setLoading(true);
+  try {
+    const state = await request("clearEncryption");
+    elements.encryptionPasswordInput.value = "";
+    renderState(state);
+    showToast("End-to-end encryption disabled for this browser.");
+  } catch (error) {
+    showToast(error.message, true);
+  } finally {
+    setLoading(false);
+  }
+}
+
 async function saveSettingsFromForm() {
   const settings = {
     defaultDeviceIden: elements.defaultDeviceSelect.value,
@@ -510,6 +587,20 @@ async function handleDemoRequest(type, payload = {}) {
         ...(payload.settings || {})
       };
       return demoState.settings;
+    case "setEncryptionPassword":
+      demoState.encryption = {
+        enabled: true,
+        fingerprint: "demo",
+        issue: null
+      };
+      return demoState;
+    case "clearEncryption":
+      demoState.encryption = {
+        enabled: false,
+        fingerprint: "",
+        issue: null
+      };
+      return demoState;
     case "clearToken":
     case "refreshDevices":
     case "reconnect":

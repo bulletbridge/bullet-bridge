@@ -4,7 +4,8 @@ import test from "node:test";
 import {
   findMirroredNotificationIds,
   makeMirrorNotificationId,
-  normalizeMirrorValue
+  normalizeMirrorValue,
+  removeMirroredNotificationState
 } from "../src/shared/mirrored-notifications.js";
 
 test("builds stable mirrored notification ids", () => {
@@ -105,6 +106,35 @@ test("returns all indistinguishable matches when Pushbullet gives no disambiguat
     "mirror:phone-1:com_whatsapp:42:",
     "mirror:phone-2:com_whatsapp:42:"
   ]);
+});
+
+test("removes multiple matched notifications in one immutable state update", () => {
+  const firstId = "mirror:phone-1:com_whatsapp:42:";
+  const secondId = "mirror:phone-2:com_whatsapp:42:";
+  const notificationMap = {
+    [firstId]: { badgeCounted: true },
+    [secondId]: { badgeCounted: true },
+    keep: { badgeCounted: true }
+  };
+  const notifications = [
+    storedNotification({ id: firstId }),
+    storedNotification({ id: secondId, sourceDeviceIden: "phone-2" }),
+    storedNotification({ id: "keep", notificationId: "99" })
+  ];
+
+  const result = removeMirroredNotificationState(
+    [firstId, secondId, firstId, ""],
+    notificationMap,
+    notifications
+  );
+
+  assert.deepEqual(result.ids, [firstId, secondId]);
+  assert.equal(result.removed, 2);
+  assert.equal(result.badgeDecrement, 2);
+  assert.deepEqual(result.notificationMap, { keep: { badgeCounted: true } });
+  assert.deepEqual(result.notifications.map((notification) => notification.id), ["keep"]);
+  assert.equal(Object.hasOwn(notificationMap, firstId), true);
+  assert.equal(notifications.length, 3);
 });
 
 function mirrorPush(overrides = {}) {

@@ -43,6 +43,12 @@ iadffmbdjdnnnpdmackjpoieokimphbn
 - Send from the right-click context menu.
 - Receive a push.
 - Receive and dismiss a mirrored Android notification.
+- Enable Pushbullet end-to-end encryption with the same password as Android,
+  then receive and dismiss an encrypted mirrored notification in both
+  directions.
+- Reload the extension and confirm encrypted mirrored notifications still work.
+- Disable encryption and confirm the local key and device fingerprint are
+  removed.
 - Search loaded push history.
 - Delete a push.
 - Load older pushes.
