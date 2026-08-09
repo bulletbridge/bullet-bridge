@@ -4,6 +4,15 @@
 
 Nothing yet.
 
+## 0.5.1 - 2026-08-09
+
+- Changed notification removal in the popup to send Pushbullet dismissal
+  events to the source Android device.
+- Added sequential bulk dismissal with partial-failure handling so failed
+  notifications remain visible and can be retried.
+- Renamed notification removal controls from clear to dismiss to describe
+  their cross-device behavior accurately.
+
 ## 0.5.0 - 2026-07-19
 
 - Added optional Pushbullet end-to-end encryption support for mirrored Android

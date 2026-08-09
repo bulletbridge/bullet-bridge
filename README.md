@@ -9,7 +9,7 @@ Bullet Bridge is an independent, unofficial client for Pushbullet users. It is n
 This repository is source-available for transparency and user trust. It is not open source in the OSI sense, and the license does not allow republishing modified copies or submitting derivative browser extensions to extension stores without permission.
 
 > [!IMPORTANT]
-> **Release availability:** Bullet Bridge v0.5.0 is available from GitHub while
+> **Release availability:** Bullet Bridge v0.5.1 is available from GitHub while
 > access to the Chrome Web Store publisher account is being restored. The
 > Chrome Web Store currently remains on v0.4.1; existing Web Store
 > installations continue to work. GitHub installations must be updated
@@ -48,7 +48,7 @@ ibhimmdnfbnhjdidoofgmlmngjdbneal
 - Encrypt mirrored-notification dismissals when end-to-end encryption is enabled.
 - Open or dismiss pushes from browser notification action buttons.
 - Dismiss mirrored Android notifications from browser notification action buttons.
-- Clear individual mirrored notifications or clear all local mirrored notifications.
+- Dismiss individual mirrored notifications or dismiss all of them from Bullet Bridge and the source Android device when supported by Pushbullet.
 - Open pushed links from browser notifications.
 
 ## End-to-End Encryption
@@ -57,7 +57,7 @@ Bullet Bridge supports Pushbullet's end-to-end encryption protocol for mirrored 
 
 The password is used only to derive the encryption key locally. It is never stored or sent. Bullet Bridge stores the derived key as a non-extractable Web Crypto key in extension-local IndexedDB and registers only its SHA-256 fingerprint with the Bullet Bridge Pushbullet device.
 
-Pushbullet's protocol does not apply end-to-end encryption to ordinary notes, links, files, or push history. Those continue to use Pushbullet's HTTPS API. Decrypted mirrored notification records are kept locally so they can be shown in the Notifications tab, and can be cleared there or by clearing the Bullet Bridge account.
+Pushbullet's protocol does not apply end-to-end encryption to ordinary notes, links, files, or push history. Those continue to use Pushbullet's HTTPS API. Decrypted mirrored notification records are kept locally so they can be shown in the Notifications tab. Dismissing them there sends a dismissal through Pushbullet to the source Android device when supported.
 
 ## Screenshots
 
@@ -94,8 +94,8 @@ installing the GitHub build, disable or remove the Web Store build to avoid
 duplicate devices and notifications. Extension settings and sign-in state do
 not transfer between the two builds.
 
-1. Download `bullet-bridge-0.5.0.zip` from the
-   [v0.5.0 GitHub release](https://github.com/bulletbridge/bullet-bridge/releases/tag/v0.5.0).
+1. Download `bullet-bridge-0.5.1.zip` from the
+   [v0.5.1 GitHub release](https://github.com/bulletbridge/bullet-bridge/releases/tag/v0.5.1).
 2. Extract the zip to a permanent folder. Do not delete that folder after
    loading the extension.
 3. Open `brave://extensions` or `chrome://extensions`.

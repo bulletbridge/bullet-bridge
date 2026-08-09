@@ -83,6 +83,39 @@ export function removeMirroredNotificationState(notificationIds, notificationMap
   };
 }
 
+export async function dismissMirroredNotificationBatch(notificationIds, dismissNotification) {
+  if (typeof dismissNotification !== "function") {
+    throw new TypeError("A notification dismissal function is required.");
+  }
+
+  const ids = [...new Set((notificationIds || [])
+    .map((id) => String(id || "").trim())
+    .filter(Boolean))];
+  const dismissedIds = [];
+  const failures = [];
+
+  for (const id of ids) {
+    try {
+      await dismissNotification(id);
+      dismissedIds.push(id);
+    } catch (error) {
+      failures.push({
+        id,
+        message: error instanceof Error ? error.message : String(error)
+      });
+    }
+  }
+
+  return {
+    requested: ids.length,
+    dismissed: dismissedIds.length,
+    failed: failures.length,
+    dismissedIds,
+    failedIds: failures.map((failure) => failure.id),
+    failures
+  };
+}
+
 function mirrorMatchScore(notification, push) {
   if (String(notification.packageName || "").trim() !== push.packageName) {
     return 0;

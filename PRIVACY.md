@@ -52,7 +52,7 @@ When enabled, Bullet Bridge uses Pushbullet's documented end-to-end encryption p
 
 Pushbullet end-to-end encryption applies to mirrored notifications and related ephemeral messages. It does not apply to normal notes, links, files, or push history. Those features continue to use Pushbullet's HTTPS API and Pushbullet-provided upload endpoints.
 
-After decryption, recent mirrored notification content is stored locally in the extension so it can appear in the Notifications tab. Users can remove individual records, clear all notification records, or clear the connected account from Bullet Bridge settings.
+After decryption, recent mirrored notification content is stored locally in the extension so it can appear in the Notifications tab. Dismissing an individual notification or all notifications sends a dismissal through Pushbullet to the source Android device when supported. Clearing the connected account removes the locally stored records and encryption key.
 
 ## No Analytics
 

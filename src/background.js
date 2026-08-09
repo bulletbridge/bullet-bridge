@@ -47,6 +47,7 @@ import {
 } from "./shared/e2e-key-store.js";
 
 import {
+  dismissMirroredNotificationBatch,
   findMirroredNotificationIds,
   makeMirrorNotificationId,
   removeMirroredNotificationState
@@ -184,8 +185,8 @@ async function handleMessage(message, sender) {
       return clearUnreadBadge();
     case "removeMirroredNotification":
       return removeMirroredNotification(message.id);
-    case "clearMirroredNotifications":
-      return clearMirroredNotifications();
+    case "dismissAllMirroredNotifications":
+      return dismissAllMirroredNotifications();
     case "openUrl":
       return openUrl(message.url);
     case "openOptions":
@@ -1590,17 +1591,13 @@ async function removeMirroredNotification(notificationId) {
   return { id };
 }
 
-async function clearMirroredNotifications() {
+async function dismissAllMirroredNotifications() {
   const stored = await getStorage(STORE_KEYS.mirroredNotifications);
   const notifications = stored[STORE_KEYS.mirroredNotifications] || [];
-  const result = await removeMirroredNotificationRecords(
+  return dismissMirroredNotificationBatch(
     notifications.map((notification) => notification.id),
-    {
-      clearSystemNotification: true,
-      decrementBadge: false
-    }
+    dismissMirroredNotification
   );
-  return { cleared: result.removed };
 }
 
 async function notifyStoredPush(push) {

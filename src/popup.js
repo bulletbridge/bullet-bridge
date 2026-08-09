@@ -25,6 +25,7 @@ const state = {
   selectedStreamId: "all",
   activeView: "pushes",
   mirroredNotifications: [],
+  notificationsDismissing: false,
   encryption: null,
   uploadStatus: null,
   draftLink: null,
@@ -65,7 +66,7 @@ const elements = {
   notificationsTab: document.querySelector("#notificationsTab"),
   pushesView: document.querySelector("#pushesView"),
   notificationsView: document.querySelector("#notificationsView"),
-  clearNotificationsButton: document.querySelector("#clearNotificationsButton"),
+  dismissAllNotificationsButton: document.querySelector("#dismissAllNotificationsButton"),
   streamList: document.querySelector("#streamList"),
   streamTitle: document.querySelector("#streamTitle"),
   streamMeta: document.querySelector("#streamMeta"),
@@ -95,7 +96,7 @@ elements.setupSignInButton.addEventListener("click", signInWithPushbullet);
 elements.setupButton.addEventListener("click", openOptions);
 elements.pushesTab.addEventListener("click", () => switchView("pushes"));
 elements.notificationsTab.addEventListener("click", () => switchView("notifications"));
-elements.clearNotificationsButton.addEventListener("click", clearAllNotifications);
+elements.dismissAllNotificationsButton.addEventListener("click", dismissAllNotifications);
 elements.refreshInboxButton.addEventListener("click", loadRecentPushes);
 elements.pushSearchInput.addEventListener("input", handlePushSearchInput);
 elements.clearSearchButton.addEventListener("click", clearPushSearch);
@@ -1550,7 +1551,8 @@ function renderNotifications() {
   const notifications = [...state.mirroredNotifications]
     .filter((notification) => !notification.dismissed)
     .sort((a, b) => Number(b.receivedAt || b.created || 0) - Number(a.receivedAt || a.created || 0));
-  elements.clearNotificationsButton.disabled = !notifications.length;
+  elements.dismissAllNotificationsButton.disabled = state.notificationsDismissing || !notifications.length;
+  elements.dismissAllNotificationsButton.setAttribute("aria-busy", String(state.notificationsDismissing));
   elements.notificationsTab.textContent = notifications.length
     ? `Notifications (${notifications.length})`
     : "Notifications";
@@ -1580,8 +1582,9 @@ function renderNotifications() {
     const closeButton = document.createElement("button");
     closeButton.className = "notification-close";
     closeButton.type = "button";
-    closeButton.title = "Clear notification";
-    closeButton.setAttribute("aria-label", "Clear notification");
+    closeButton.disabled = state.notificationsDismissing;
+    closeButton.title = "Dismiss notification";
+    closeButton.setAttribute("aria-label", "Dismiss notification");
     closeButton.append(svgIcon([
       "M18 6 6 18",
       "m6 6 12 12"
@@ -1643,11 +1646,15 @@ function encryptionNotice(message) {
 }
 
 async function removeNotification(notificationId) {
+  if (state.notificationsDismissing) {
+    return;
+  }
+
   if (demoMode) {
     removeDemoNotification(demoState, notificationId);
     state.mirroredNotifications = demoState.mirroredNotifications || [];
     renderNotifications();
-    setFeedback("Notification cleared.");
+    setFeedback("Notification dismissed.");
     return;
   }
 
@@ -1655,14 +1662,14 @@ async function removeNotification(notificationId) {
     await request("removeMirroredNotification", { id: notificationId });
     state.mirroredNotifications = state.mirroredNotifications.filter((notification) => notification.id !== notificationId);
     renderNotifications();
-    setFeedback("Notification cleared.");
+    setFeedback("Notification dismissed.");
   } catch (error) {
     setFeedback(error.message, true);
   }
 }
 
-async function clearAllNotifications() {
-  if (!state.mirroredNotifications.length) {
+async function dismissAllNotifications() {
+  if (state.notificationsDismissing || !state.mirroredNotifications.length) {
     return;
   }
 
@@ -1670,20 +1677,32 @@ async function clearAllNotifications() {
     const result = clearDemoNotifications(demoState);
     state.mirroredNotifications = [];
     renderNotifications();
-    setFeedback(result.cleared ? "Notifications cleared." : "No notifications to clear.");
+    setFeedback(result.cleared ? "Notifications dismissed." : "No notifications to dismiss.");
     return;
   }
 
+  state.notificationsDismissing = true;
+  renderNotifications();
+
   try {
-    elements.clearNotificationsButton.disabled = true;
-    const result = await request("clearMirroredNotifications");
-    state.mirroredNotifications = [];
+    const result = await request("dismissAllMirroredNotifications");
+    const dismissedIds = new Set(result.dismissedIds || []);
+    state.mirroredNotifications = state.mirroredNotifications
+      .filter((notification) => !dismissedIds.has(notification.id));
     renderNotifications();
-    setFeedback(result.cleared ? "Notifications cleared." : "No notifications to clear.");
+    if (result.failed) {
+      setFeedback(
+        `${result.dismissed} dismissed; ${result.failed} could not be dismissed.`,
+        true
+      );
+    } else {
+      setFeedback(result.dismissed ? "Notifications dismissed." : "No notifications to dismiss.");
+    }
   } catch (error) {
     setFeedback(error.message, true);
   } finally {
-    elements.clearNotificationsButton.disabled = !state.mirroredNotifications.length;
+    state.notificationsDismissing = false;
+    renderNotifications();
   }
 }
 
