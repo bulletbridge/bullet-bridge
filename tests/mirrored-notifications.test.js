@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  dismissMirroredNotificationBatch,
   findMirroredNotificationIds,
   makeMirrorNotificationId,
   normalizeMirrorValue,
@@ -135,6 +136,50 @@ test("removes multiple matched notifications in one immutable state update", () 
   assert.deepEqual(result.notifications.map((notification) => notification.id), ["keep"]);
   assert.equal(Object.hasOwn(notificationMap, firstId), true);
   assert.equal(notifications.length, 3);
+});
+
+test("dismisses a unique batch sequentially", async () => {
+  const calls = [];
+  const result = await dismissMirroredNotificationBatch(
+    ["mirror-1", "mirror-2", "mirror-1", ""],
+    async (id) => {
+      calls.push(id);
+    }
+  );
+
+  assert.deepEqual(calls, ["mirror-1", "mirror-2"]);
+  assert.deepEqual(result, {
+    requested: 2,
+    dismissed: 2,
+    failed: 0,
+    dismissedIds: ["mirror-1", "mirror-2"],
+    failedIds: [],
+    failures: []
+  });
+});
+
+test("continues bulk dismissal and preserves failed ids", async () => {
+  const calls = [];
+  const result = await dismissMirroredNotificationBatch(
+    ["mirror-1", "mirror-2", "mirror-3"],
+    async (id) => {
+      calls.push(id);
+      if (id === "mirror-2") {
+        throw new Error("Pushbullet is unavailable.");
+      }
+    }
+  );
+
+  assert.deepEqual(calls, ["mirror-1", "mirror-2", "mirror-3"]);
+  assert.equal(result.requested, 3);
+  assert.equal(result.dismissed, 2);
+  assert.equal(result.failed, 1);
+  assert.deepEqual(result.dismissedIds, ["mirror-1", "mirror-3"]);
+  assert.deepEqual(result.failedIds, ["mirror-2"]);
+  assert.deepEqual(result.failures, [{
+    id: "mirror-2",
+    message: "Pushbullet is unavailable."
+  }]);
 });
 
 function mirrorPush(overrides = {}) {
