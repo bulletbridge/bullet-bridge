@@ -11,6 +11,7 @@ import {
   filterPushesBySearch,
   normalizeSearchQuery
 } from "./shared/push-search.js";
+import { matchingPageTitle } from "./shared/link-utils.js";
 
 const state = {
   settings: null,
@@ -350,6 +351,14 @@ async function sendPush(event) {
 
   try {
     setSending(true);
+    if (push.type === "link" && !push.title) {
+      try {
+        const tab = await request("getCurrentTab");
+        push.title = matchingPageTitle(push.url, tab.url, tab.title);
+      } catch {
+        // A page title is optional; do not block sending the link if it is unavailable.
+      }
+    }
     await request("sendPush", { push });
     elements.bodyInput.value = "";
     state.draftLink = null;
@@ -919,7 +928,7 @@ function renderPushList(pushes, options = {}) {
     const content = messageContent(push);
     bubble.append(messageActionsForPush(push));
 
-    if (content.title) {
+    if (content.title && push.type !== "link") {
       const title = document.createElement("h3");
       title.textContent = content.title;
       bubble.append(title);
@@ -934,7 +943,7 @@ function renderPushList(pushes, options = {}) {
     route.textContent = `${routeLabel(push)} / ${formatTime(push.created)}`;
     bubble.append(route);
 
-    if (push.url) {
+    if (push.url && push.type !== "link") {
       const button = document.createElement("button");
       button.className = "link-button";
       button.type = "button";
@@ -1153,11 +1162,15 @@ function looksLikeUrlFragment(text) {
 }
 
 function linkPreview(push, content) {
-  const preview = document.createElement("button");
+  const href = safeLinkHref(push.url);
+  const preview = document.createElement(href ? "a" : "div");
   preview.className = "link-preview";
-  preview.type = "button";
   preview.title = push.url;
-  preview.addEventListener("click", () => openPushUrl(push.url));
+  if (href) {
+    preview.href = href;
+    preview.target = "_blank";
+    preview.rel = "noopener noreferrer";
+  }
 
   const visual = linkPreviewVisual(push);
   if (visual) {
@@ -1171,13 +1184,22 @@ function linkPreview(push, content) {
   label.className = "link-preview-title";
   label.textContent = content.title || readableUrlLabel(push.url);
 
-  const meta = document.createElement("span");
-  meta.className = "link-preview-meta";
-  meta.textContent = readableUrlMeta(push.url);
+  const url = document.createElement("span");
+  url.className = "link-preview-url";
+  url.textContent = push.url;
 
-  text.append(label, meta);
+  text.append(label, url);
   preview.append(text);
   return preview;
+}
+
+function safeLinkHref(value) {
+  try {
+    const url = new URL(String(value || "").trim());
+    return ["http:", "https:"].includes(url.protocol) ? url.href : "";
+  } catch {
+    return "";
+  }
 }
 
 function linkPreviewVisual(push) {

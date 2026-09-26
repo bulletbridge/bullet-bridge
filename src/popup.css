@@ -692,11 +692,19 @@ html.standalone-mode.setup-mode,
   width: min(100%, 380px);
   min-width: 0;
   min-height: 44px;
+  border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
+  border-radius: 7px;
   padding: 7px 9px;
-  border-color: color-mix(in srgb, var(--border) 78%, transparent);
   background: color-mix(in srgb, var(--panel) 88%, var(--bg));
   color: var(--text);
   text-align: left;
+  text-decoration: none;
+}
+
+.link-preview:focus-visible {
+  outline: 1px solid color-mix(in srgb, var(--focus) 72%, transparent);
+  outline-offset: 1px;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--focus) 18%, transparent);
 }
 
 .message-row.sent .link-preview {
@@ -747,8 +755,7 @@ html.standalone-mode.setup-mode,
 }
 
 .link-preview-text,
-.link-preview-title,
-.link-preview-meta {
+.link-preview-title {
   min-width: 0;
 }
 
@@ -757,21 +764,19 @@ html.standalone-mode.setup-mode,
   gap: 2px;
 }
 
-.link-preview-title,
-.link-preview-meta {
+.link-preview-title {
+  font-size: 12px;
+  font-weight: 700;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.link-preview-title {
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.link-preview-meta {
-  color: var(--muted);
-  font-size: 12px;
+.link-preview-url {
+  overflow-wrap: anywhere;
+  color: var(--primary-strong);
+  font-size: 11px;
+  line-height: 1.3;
 }
 
 .file-preview {
