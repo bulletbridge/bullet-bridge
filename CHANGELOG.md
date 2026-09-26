@@ -4,6 +4,11 @@
 
 Nothing yet.
 
+## 0.5.2 - 2026-09-26
+
+- Added the active page title when sending a link that matches the current page.
+- Made link pushes in history clickable and show their full URL.
+
 ## 0.5.1 - 2026-08-09
 
 - Changed notification removal in the popup to send Pushbullet dismissal

@@ -9,7 +9,7 @@ Bullet Bridge is an independent, unofficial client for Pushbullet users. It is n
 This repository is source-available for transparency and user trust. It is not open source in the OSI sense, and the license does not allow republishing modified copies or submitting derivative browser extensions to extension stores without permission.
 
 > [!IMPORTANT]
-> **Release availability:** Bullet Bridge v0.5.1 is available from GitHub while
+> **Release availability:** Bullet Bridge v0.5.2 is available from GitHub while
 > access to the Chrome Web Store publisher account is being restored. The
 > Chrome Web Store currently remains on v0.4.1; existing Web Store
 > installations continue to work. GitHub installations must be updated
@@ -31,12 +31,14 @@ ibhimmdnfbnhjdidoofgmlmngjdbneal
 - Save and test a Pushbullet access token as a manual fallback.
 - Register this browser as a Pushbullet device with a browser-specific name, such as `Bullet Bridge (Brave)`.
 - Send notes, links, current-tab links, and files.
+- Add the active page title when sending a link to that same page.
 - Open the popup in a persistent window when a Linux compositor closes browser-action popups during file selection.
 - Send to all devices or a selected device.
 - Browse recent push history in a chat-style popup.
 - Load older pushes on demand.
 - Search the loaded push history by message, URL, file, and device text.
 - Preview image, video, file, and link pushes in the chat history.
+- Open link pushes directly from their titled cards, which show the full URL.
 - Copy exact push content from chat bubbles.
 - Delete individual pushes from chat history.
 - Push pages, links, selected text, and image URLs from the right-click context menu.
@@ -94,8 +96,8 @@ installing the GitHub build, disable or remove the Web Store build to avoid
 duplicate devices and notifications. Extension settings and sign-in state do
 not transfer between the two builds.
 
-1. Download `bullet-bridge-0.5.1.zip` from the
-   [v0.5.1 GitHub release](https://github.com/bulletbridge/bullet-bridge/releases/tag/v0.5.1).
+1. Download `bullet-bridge-0.5.2.zip` from the
+   [v0.5.2 GitHub release](https://github.com/bulletbridge/bullet-bridge/releases/tag/v0.5.2).
 2. Extract the zip to a permanent folder. Do not delete that folder after
    loading the extension.
 3. Open `brave://extensions` or `chrome://extensions`.
